@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-const s = "hello"
+const s = 'hello'
 </script>
 
 <style scoped>
-.h1{
+.h1 {
   background-color: red;
 }
 </style>
