@@ -15,6 +15,13 @@ app.use(ElementPlus, {
   locale: zhCn,
 })
 //打印环境变量
-console.log(import.meta.env) 
+console.log(import.meta.env)
+//svg文件需要的配置代码
+//@ts-ignore
+import 'virtual:svg-icons-register'
+//引入自定义插件对象:注册整个项目全局组件
+import gloablComponent from '@/components';
+//安装自定义插件对象
+app.use(gloablComponent);
 //将应用挂载到挂载点上
 app.mount('#app')
