@@ -25,6 +25,23 @@
 //引入图标组件
 import { Plus } from '@element-plus/icons-vue'
 import Test from '@/components/Test.vue'
+import { onMounted } from 'vue'
+import { reqLogin, reqUserInfo } from './api/user'
+
+onMounted(() => {
+  // 包一层async函数
+  async function loadData() {
+    // 1.登录
+    const loginRes = await reqLogin({ username: 'admin', password: '111111' })
+    console.log('登录结果：', loginRes)
+    localStorage.setItem('token', loginRes.data.token)
+    // 2.获取用户信息，记得加 () 执行函数
+    const userRes = await reqUserInfo()
+    console.log('用户信息：', userRes)
+  }
+
+  loadData()
+})
 </script>
 
 <style scoped lang="scss">
