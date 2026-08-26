@@ -27,11 +27,12 @@ import { Plus } from '@element-plus/icons-vue'
 import Test from '@/components/Test.vue'
 </script>
 
-<style scoped>
-h1 {
-  background-color: red;
+<style scoped lang="scss">
+div {
+  h1 {
+    background-color: $base-color;
+  }
 }
-
 .el-button {
   margin-bottom: 20px;
 }

@@ -23,5 +23,7 @@ import 'virtual:svg-icons-register'
 import gloablComponent from '@/components'
 //安装自定义插件对象
 app.use(gloablComponent)
+//引入模板的全局样式
+import '@/styles/index.scss'
 //将应用挂载到挂载点上
 app.mount('#app')
