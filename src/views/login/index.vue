@@ -42,6 +42,8 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
+//引入获取当前时间的函数
+import { getTime } from '@/utils/time'
 //引入用户相关的小仓库
 import useUserStore from '@/store/modules/user'
 
@@ -64,7 +66,8 @@ const login = async () => {
     //登陆成功提示信息
     ElNotification({
       type: 'success',
-      message: '登陆成功',
+      message: '欢迎回来',
+      title: `Hi, ${getTime()}好`,
     })
     loading.value = false
   } catch (error) {
