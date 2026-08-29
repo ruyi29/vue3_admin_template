@@ -3,16 +3,21 @@
     <el-row>
       <el-col :span="12" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
-        <el-form class="login_form">
+        <el-form
+          class="login_form"
+          :model="loginForm"
+          :rules="rules"
+          ref="loginForms"
+        >
           <h1>Hello</h1>
           <h2>欢迎来到硅谷甄选</h2>
-          <el-form-item>
+          <el-form-item prop="username">
             <el-input
               :prefix-icon="User"
               v-model="loginForm.username"
             ></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item prop="password">
             <el-input
               type="password"
               :prefix-icon="Lock"
@@ -48,6 +53,8 @@ import { getTime } from '@/utils/time'
 import useUserStore from '@/store/modules/user'
 
 let useStore = useUserStore()
+//获取el-form组件
+let loginForms = ref()
 //获取路由器
 let $router = useRouter()
 //定义变量控制加载效果
@@ -56,6 +63,8 @@ let loading = ref(false)
 let loginForm = reactive({ username: 'admin', password: '111111' })
 // 登录回调按钮
 const login = async () => {
+  //保证所有表单项都通过再发请求
+  await loginForms.value.validate()
   //开始加载效果
   loading.value = true
   try {
@@ -78,6 +87,41 @@ const login = async () => {
       message: (error as Error).message,
     })
   }
+}
+//自定义校验规则函数
+const validatorUserName = (rule: any, value: any, callback: any) => {
+  //rule为校验规则对象；value为表单元素文本内容
+  //函数：如果符合条件callback放行通过，如果不符合条件callback方法注入错误信息
+  if (value.length >= 5) {
+    callback()
+  } else {
+    callback(new Error('账号长度至少五位'))
+  }
+}
+const validatorPassword = (rule: any, value: any, callback: any) => {
+  //rule为校验规则对象；value为表单元素文本内容
+  //函数：如果符合条件callback放行通过，如果不符合条件callback方法注入错误信息
+  if (value.length >= 6) {
+    callback()
+  } else {
+    callback(new Error('密码长度至少六位'))
+  }
+}
+
+//定义表单校验需要配置的对象
+const rules = {
+  //required表示该字段必须校验
+  //min，max表示文本长度
+  //message表示错误提示信息
+  //trigger表示触发表单校验的时机；change表示文本变化触发校验；blur表示失去焦点触发校验
+  username: [
+    // {required: true, min:6, max:10, message:'账号长度至少六位', trigger: 'change'}
+    { trigger: 'change', validator: validatorUserName },
+  ],
+  password: [
+    // { required: true, min: 6, max: 15, message: '密码长度至少六位', trigger: 'change' }
+    { trigger: 'change', validator: validatorPassword },
+  ],
 }
 </script>
 
