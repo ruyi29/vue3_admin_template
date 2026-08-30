@@ -5,7 +5,7 @@
       <Logo></Logo>
       <!-- 展示菜单 -->
       <!-- 滚动组件 -->
-      <el-scrollbar height="400px" class="scrollbar">
+      <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
         <el-menu background-color="#001529" text-color="white">
           <!-- 根据路由动态生成菜单 -->
@@ -17,7 +17,7 @@
     <div class="layout_tabbar">456</div>
     <!-- 内容展示区域 -->
     <div class="layout_main">
-      <p>123</p>
+      <Main></Main>
     </div>
   </div>
 </template>
@@ -27,6 +27,8 @@
 import Logo from '@/layout/logo/index.vue'
 //引入菜单组件
 import Menu from '@/layout/menu/index.vue'
+//右侧内容展示区域
+import Main from '@/layout/main/index.vue'
 //获取用户相关的小仓库
 import useUserStore from '@/store/modules/user'
 let useStore = useUserStore()
@@ -65,7 +67,7 @@ let useStore = useUserStore()
     position: absolute;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    background: yellow;
+    background: red;
     top: $base-tabbar-height;
     left: $base-menu-width;
     overflow: auto;
