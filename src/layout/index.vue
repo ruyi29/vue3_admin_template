@@ -18,7 +18,10 @@
       </el-scrollbar>
     </div>
     <!-- 顶部菜单 -->
-    <div class="layout_tabbar">456</div>
+    <div class="layout_tabbar">
+      <!-- layout组件的顶部导航tabbar -->
+      <Tabbar></Tabbar>
+    </div>
     <!-- 内容展示区域 -->
     <div class="layout_main">
       <Main></Main>
@@ -35,6 +38,8 @@ import Logo from '@/layout/logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
 //右侧内容展示区域
 import Main from '@/layout/main/index.vue'
+//顶部导航tabbar
+import Tabbar from '@/layout/tabbar/index.vue'
 //获取用户相关的小仓库
 import useUserStore from '@/store/modules/user'
 
@@ -47,12 +52,12 @@ console.log($route)
 .layout_container {
   width: 100%;
   height: 100vh;
-  color: white;
 
   .layout_slider {
     width: $base-menu-width;
     height: 100vh;
     background: $base-menu-background;
+    color: white;
 
     .scrollbar {
       width: 100%;
@@ -68,7 +73,6 @@ console.log($route)
     position: fixed;
     width: calc(100% - $base-menu-width);
     height: $base-tabbar-height;
-    background: green;
     top: 0;
     left: $base-menu-width;
   }
