@@ -16,6 +16,8 @@ import gloablComponent from '@/components'
 import router from './router'
 //引入仓库
 import pinia from './store'
+//引入路由鉴权
+import '@/permission'
 
 //获取应用实例对象
 const app = createApp(App)
