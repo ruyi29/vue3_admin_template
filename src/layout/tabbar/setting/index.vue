@@ -1,5 +1,10 @@
 <template>
-  <el-button size="small" icon="Refresh" circle></el-button>
+  <el-button
+    size="small"
+    icon="Refresh"
+    circle
+    @click="updateRefsh"
+  ></el-button>
   <el-button size="small" icon="FullScreen" circle></el-button>
   <el-button size="small" icon="Setting" circle></el-button>
   <img src="/logo.png" style="width: 24px; height: 24px; margin: 0px 10px" />
@@ -19,7 +24,14 @@
   </el-dropdown>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+//获取骨架的小仓库
+import useLayOutSettingStore from '@/store/modules/setting'
+let layoutSettingStore = useLayOutSettingStore()
+const updateRefsh = () => {
+  layoutSettingStore.refsh = !layoutSettingStore.refsh
+}
+</script>
 
 <script lang="ts">
 export default {
