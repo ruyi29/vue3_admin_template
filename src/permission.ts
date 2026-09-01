@@ -12,11 +12,11 @@ let userStore = useUserStore(pinia)
 nprogress.configure({ showSpinner: false })
 //全局守卫:项目当中任意路由切换都会触发的钩子
 //全局前置守卫
-router.beforeEach(async (to: any, from: any, next: any) => {
+router.beforeEach(async (to: any, from: any) => {
   document.title = `${setting.title} - ${to.meta.title}`
   //to:你将要访问那个路由
   //from:你从来个路由而来
-  //next:路由的放行函数
+  //next:路由的放行函数(现在一般改用return true|false|路由地址对象)
   nprogress.start() //进度条开始
   //获取token,去判断用户登录、还是未登录
   let token = userStore.token
@@ -26,31 +26,31 @@ router.beforeEach(async (to: any, from: any, next: any) => {
   if (token) {
     //登录成功,访问login,不能访问，指向首页
     if (to.path == '/login') {
-      next({ path: '/' })
+      return '/'
     } else {
       //登录成功访问其余六个路由(登录排除)
       //如果有用户信息
-      if (username) next()
+      if (username) return true
       else {
         try {
           //获取用户信息
           await userStore.userInfo()
-          next()
+          return true
         } catch (error) {
           //token过期:获取不到用户信息了
           //用户手动修改本地存储token
           //退出登录->用户相关的数据清空
           await userStore.userLogout()
-          next({ path: '/login', query: { redirect: to.path } })
+          return { path: '/login', query: { redirect: to.path } }
         }
       }
     }
   } else {
     //用户未登录判断
     if (to.path == '/login') {
-      next()
+      return true
     } else {
-      next({ path: '/login', query: { redirect: to.path } })
+      return { path: '/login', query: { redirect: to.path } }
     }
   }
 })
