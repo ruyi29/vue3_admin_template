@@ -59,11 +59,11 @@ const fullScreen = () => {
     document.exitFullscreen()
   }
 }
-//退出登录i点击回调
-const logout = () => {
+//退出登录点击回调
+const logout = async () => {
   //向服务器发请求【退出登录接口】（目前没有该接口）
   //项目中关于用户的相关信息清除
-  userStore.userLogout()
+  await userStore.userLogout()
   //跳转到登录界面
   $router.push({ path: '/login', query: { redirect: $route.path } })
 }

@@ -26,8 +26,6 @@ const app = createApp(App)
 app.use(ElementPlus, {
   locale: zhCn,
 })
-//打印环境变量
-console.log(import.meta.env)
 //安装自定义插件对象
 app.use(gloablComponent)
 //安装仓库
