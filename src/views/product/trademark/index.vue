@@ -28,6 +28,8 @@
     </el-table>
     <!-- 分页器 -->
     <el-pagination
+      @current-change="getHasTrademark"
+      @size-change="sizeChange"
       v-model:current-page="pageNo"
       v-model:page-size="limit"
       :page-sizes="[3, 5, 7, 9]"
@@ -67,6 +69,11 @@ const getHasTrademark = async () => {
 onMounted(() => {
   getHasTrademark()
 })
+
+const sizeChange = () => {
+  pageNo.value = 1
+  getHasTrademark()
+}
 
 const addTrademark = () => {
   console.log('添加品牌')
