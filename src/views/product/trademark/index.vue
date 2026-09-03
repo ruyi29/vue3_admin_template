@@ -20,12 +20,12 @@
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template #>
+        <template #="{ row }">
           <el-button
             type="primary"
             size="small"
             icon="Edit"
-            @click="updateTrademark"
+            @click="updateTrademark(row)"
           ></el-button>
           <el-button type="danger" size="small" icon="Delete"></el-button>
         </template>
@@ -45,7 +45,10 @@
   </el-card>
   <!-- 对话框组件，添加修改品牌 -->
   <!-- v-model：控制对话框的显示与隐藏；title：设置对话框左上角标题 -->
-  <el-dialog v-model="dialogFormVisible" title="添加品牌">
+  <el-dialog
+    v-model="dialogFormVisible"
+    :title="trademarkParams.id ? '修改品牌' : '添加品牌'"
+  >
     <el-form style="width: 80%">
       <el-form-item label="品牌名称" label-width="80px">
         <el-input
@@ -164,11 +167,13 @@ const confirm = async () => {
     //关闭对话框
     dialogFormVisible.value = false
     //弹出提示信息
-    ElMessage.success('添加品牌成功')
+    ElMessage.success(
+      trademarkParams.value.id ? '修改品牌成功' : '添加品牌成功',
+    )
     //再次调用获取品牌列表接口
     getHasTrademark()
   } else {
-    ElMessage.error('添加品牌失败')
+    ElMessage.error(trademarkParams.value.id ? '修改品牌失败' : '添加品牌失败')
     dialogFormVisible.value = false
   }
 }
@@ -176,8 +181,13 @@ const confirm = async () => {
 const cancel = () => {
   dialogFormVisible.value = false
 }
-const updateTrademark = () => {
+const updateTrademark = (row: Trademark) => {
   dialogFormVisible.value = true
+  //ES6语法合并对象(拷贝)
+  Object.assign(trademarkParams.value, row)
+  // trademarkParams.value.id = row.id
+  // trademarkParams.value.tmName = row.tmName
+  // trademarkParams.value.logoUrl = row.logoUrl
 }
 </script>
 
