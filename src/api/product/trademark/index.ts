@@ -9,6 +9,8 @@ const API = {
   ADDTRADEMARK_URL: '/admin/product/baseTrademark/save',
   //修改品牌
   UPDATETRADEMARK_URL: '/admin/product/baseTrademark/update',
+  //删除已有品牌
+  DELETE_URL: '/admin/product/baseTrademark/remove/',
 } as const
 
 // page：获取第几页；limit：每页显示多少条数据
@@ -27,3 +29,7 @@ export const reqAddOrUpdateTrademark = (data: Trademark) => {
     return request.post<any, any>(API.ADDTRADEMARK_URL, data)
   }
 }
+
+// 删除已有品牌的接口
+export const reqDeleteTrademark = (id: number) =>
+  request.delete<any, any>(API.DELETE_URL + id)
