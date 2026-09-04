@@ -137,7 +137,7 @@ const getHasTrademark = async () => {
     total.value = res.data.total
     trademarkArr.value = res.data.records
   } else {
-    console.log('获取品牌列表失败', res.message)
+    ElMessage.error(res.message)
   }
 }
 //组件挂载后调用获取品牌列表接口
@@ -233,7 +233,6 @@ const validatorTmName = (rule: any, value: any, callBack: any) => {
 }
 //品牌LOGO图片的自定义校验规则方法
 const validatorLogoUrl = (rule: any, value: any, callBack: any) => {
-  console.log(456)
   //如果图片上传
   if (value) {
     callBack()
