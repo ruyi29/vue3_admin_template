@@ -41,7 +41,14 @@
               icon="Edit"
               @click="updateAttr(row)"
             ></el-button>
-            <el-button type="danger" size="small" icon="Delete"></el-button>
+            <el-popconfirm
+              :title="`您确定删除“${row.attrName}”属性吗？`"
+              @confirm="deleteAttr(row.id)"
+            >
+              <template #reference>
+                <el-button type="danger" size="small" icon="Delete"></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -115,8 +122,8 @@
 </template>
 
 <script setup lang="ts">
-import { watch, ref, reactive, nextTick } from 'vue'
-import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr'
+import { watch, ref, reactive, nextTick, onBeforeUnmount } from 'vue'
+import { reqAttr, reqAddOrUpdateAttr, reqDeleteAttr } from '@/api/product/attr'
 import type { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
 import useCatoryStore from '@/store/modules/category'
 import { ElMessage } from 'element-plus'
@@ -221,9 +228,27 @@ const updateAttr = (row: Attr) => {
   //这样是深拷贝，直接写row是浅拷贝
   Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
+//取消
 const cancel = () => {
   scene.value = 0
 }
+//删除属性
+const deleteAttr = async (attrId: number) => {
+  let res = await reqDeleteAttr(attrId)
+  if (res.code == 200) {
+    ElMessage.success('删除属性成功')
+    getAttr()
+  } else {
+    ElMessage.error('删除属性失败')
+  }
+}
+//路由组件销毁的时候，把仓库分类相关的数据清空
+//onBeforeUnmount是卸载前执行，onUnmount是卸载后执行
+//onBeforeMount是挂载前执行，onMounted是挂载后执行
+onBeforeUnmount(() => {
+  //清空仓库的数据
+  categoryStore.$reset()
+})
 </script>
 
 <style scoped></style>

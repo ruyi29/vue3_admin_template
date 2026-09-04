@@ -8,6 +8,7 @@ const API = {
   C3_URL: '/admin/product/getCategory3', // 获取三级分类的接口
   ATTR_URL: '/admin/product/attrInfoList', // 获取平台属性的接口
   ADD_OR_UPDATE_URL: '/admin/product/saveAttrInfo', // 添加或修改属性的接口
+  DELETEATTR_URL: '/admin/product/deleteAttr', // 删除属性的接口
 } as const
 
 export const reqC1 = () => request.get<any, CategoryResponseData>(API.C1_URL)
@@ -25,3 +26,5 @@ export const reqAttr = (
   )
 export const reqAddOrUpdateAttr = (data: Attr) =>
   request.post<any, any>(API.ADD_OR_UPDATE_URL, data)
+export const reqDeleteAttr = (attrId: number) =>
+  request.delete<any, any>(API.DELETEATTR_URL + `/${attrId}`)
