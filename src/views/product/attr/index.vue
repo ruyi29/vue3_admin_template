@@ -34,12 +34,12 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120px">
-          <template #>
+          <template #="{ row }">
             <el-button
               type="primary"
               size="small"
               icon="Edit"
-              @click="updateAttr"
+              @click="updateAttr(row)"
             ></el-button>
             <el-button type="danger" size="small" icon="Delete"></el-button>
           </template>
@@ -92,7 +92,7 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template #="{ row, $index }">
+          <template #="{ $index }">
             <el-button
               type="danger"
               size="small"
@@ -216,8 +216,10 @@ const toEdit = (row: AttrValue, $index: number) => {
   })
 }
 //编辑属性
-const updateAttr = () => {
+const updateAttr = (row: Attr) => {
   scene.value = 1
+  //这样是深拷贝，直接写row是浅拷贝
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
 const cancel = () => {
   scene.value = 0
