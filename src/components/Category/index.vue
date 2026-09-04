@@ -6,6 +6,7 @@
           style="width: 180px"
           v-model="categoryStore.c1Id"
           @change="handler"
+          :disabled="scene == 1"
         >
           <!-- option:label即为显示文字 value属性即为select下拉菜单收集的数据-->
           <el-option
@@ -21,6 +22,7 @@
           style="width: 180px"
           v-model="categoryStore.c2Id"
           @change="handler1"
+          :disabled="scene == 1"
         >
           <el-option
             v-for="c2 in categoryStore.c2Arr"
@@ -31,7 +33,11 @@
         </el-select>
       </el-form-item>
       <el-form-item label="三级分类">
-        <el-select style="width: 180px" v-model="categoryStore.c3Id">
+        <el-select
+          style="width: 180px"
+          v-model="categoryStore.c3Id"
+          :disabled="scene == 1"
+        >
           <el-option
             v-for="c3 in categoryStore.c3Arr"
             :label="c3.name"
@@ -45,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, defineProps } from 'vue'
 import useCatoryStore from '@/store/modules/category'
 
 let categoryStore = useCatoryStore()
@@ -69,6 +75,7 @@ const handler1 = () => {
   categoryStore.c3Id = ''
   categoryStore.getC3()
 }
+defineProps(['scene'])
 </script>
 
 <style scoped></style>
