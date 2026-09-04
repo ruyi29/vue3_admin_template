@@ -79,18 +79,28 @@
         <el-table-column label="属性值">
           <template #="{ row, $index }">
             <el-input
+              :ref="(vc: any) => (inputArr[$index] = vc)"
               v-if="row.flag"
               v-model="row.valueName"
               placeholder="请输入属性值"
               size="small"
               @blur="toLook(row, $index)"
             ></el-input>
-            <div v-else @click="toEdit(row)">
+            <div v-else @click="toEdit(row, $index)">
               {{ row.valueName }}
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="操作">
+          <template #="{ row, $index }">
+            <el-button
+              type="danger"
+              size="small"
+              icon="Delete"
+              @click="attrParams.attrValueList.splice($index, 1)"
+            ></el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <el-button
         type="primary"
@@ -105,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, ref, reactive } from 'vue'
+import { watch, ref, reactive, nextTick } from 'vue'
 import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr'
 import type { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
 import useCatoryStore from '@/store/modules/category'
@@ -121,6 +131,8 @@ let attrParams = reactive<Attr>({
   categoryId: '', //三级分类的ID
   categoryLevel: 3, //代表的是三级分类
 })
+//存储对应的组件实例el-input
+let inputArr = ref<any>([])
 
 //监听三级分类id变化，获取属性
 watch(
@@ -155,6 +167,10 @@ const addAttrValue = () => {
   attrParams.attrValueList.push({
     valueName: '',
     flag: true, //控制每一个属性值编辑模式与切换模式的切换
+  })
+  //获取最后el-input组件聚焦
+  nextTick(() => {
+    inputArr.value[attrParams.attrValueList.length - 1].focus()
   })
 }
 //保存属性
@@ -193,8 +209,11 @@ const toLook = (row: AttrValue, $index: number) => {
   row.flag = false
 }
 //属性值表单元素点击时，切换为编辑模式
-const toEdit = (row: AttrValue) => {
+const toEdit = (row: AttrValue, $index: number) => {
   row.flag = true
+  nextTick(() => {
+    inputArr.value[$index].focus()
+  })
 }
 //编辑属性
 const updateAttr = () => {
