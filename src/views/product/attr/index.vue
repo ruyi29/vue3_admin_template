@@ -77,16 +77,28 @@
           type="index"
         ></el-table-column>
         <el-table-column label="属性值">
-          <template #="{ row }">
+          <template #="{ row, $index }">
             <el-input
+              v-if="row.flag"
               v-model="row.valueName"
               placeholder="请输入属性值"
+              size="small"
+              @blur="toLook(row, $index)"
             ></el-input>
+            <div v-else @click="toEdit(row)">
+              {{ row.valueName }}
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="操作"></el-table-column>
       </el-table>
-      <el-button type="primary" @click="save">保存</el-button>
+      <el-button
+        type="primary"
+        @click="save"
+        :disabled="attrParams.attrValueList.length > 0 ? false : true"
+      >
+        保存
+      </el-button>
       <el-button @click="cancel">取消</el-button>
     </div>
   </el-card>
@@ -95,7 +107,7 @@
 <script setup lang="ts">
 import { watch, ref, reactive } from 'vue'
 import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr'
-import type { AttrResponseData, Attr } from '@/api/product/attr/type'
+import type { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
 import useCatoryStore from '@/store/modules/category'
 import { ElMessage } from 'element-plus'
 
@@ -140,7 +152,10 @@ const addAttr = () => {
 }
 //添加属性值
 const addAttrValue = () => {
-  attrParams.attrValueList.push({ valueName: '' })
+  attrParams.attrValueList.push({
+    valueName: '',
+    flag: true, //控制每一个属性值编辑模式与切换模式的切换
+  })
 }
 //保存属性
 const save = async () => {
@@ -152,6 +167,34 @@ const save = async () => {
   } else {
     ElMessage.error(attrParams.id ? '修改属性失败' : '添加属性失败')
   }
+}
+//属性值表单元素失去焦点时，切换为展示模式
+const toLook = (row: AttrValue, $index: number) => {
+  //非法情况1：属性为空
+  if (row.valueName.trim() == '') {
+    //删除调用对应属性值为空的元素
+    attrParams.attrValueList.splice($index, 1)
+    ElMessage.error('属性值不能为空')
+    return
+  }
+  //非法情况2：属性重复
+  let repeat = attrParams.attrValueList.find((item) => {
+    //把当前失却焦点属性值对象从当前数组扣除判断
+    if (item != row) {
+      return item.valueName === row.valueName
+    }
+  })
+  if (repeat) {
+    //将重复的属性值删除掉
+    attrParams.attrValueList.splice($index, 1)
+    ElMessage.error('属性值不能重复')
+    return
+  }
+  row.flag = false
+}
+//属性值表单元素点击时，切换为编辑模式
+const toEdit = (row: AttrValue) => {
+  row.flag = true
 }
 //编辑属性
 const updateAttr = () => {
