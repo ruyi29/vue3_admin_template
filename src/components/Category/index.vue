@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, defineProps } from 'vue'
+import { onMounted } from 'vue'
 import useCatoryStore from '@/store/modules/category'
 
 let categoryStore = useCatoryStore()
