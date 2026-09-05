@@ -1,11 +1,12 @@
 <template>
-  <div>
-    <Category :scene="scene" />
-    <el-card style="margin: 10px 0px">
+  <Category :scene="scene" />
+  <el-card style="margin: 10px 0px">
+    <div v-show="scene == 0">
       <el-button
         type="primary"
         icon="Plus"
         :disabled="categoryStore.c3Id ? false : true"
+        @click="addSpu"
       >
         添加SPU
       </el-button>
@@ -39,6 +40,7 @@
               size="small"
               icon="Edit"
               title="修改SPU"
+              @click="updateSpu"
             ></el-button>
             <el-button
               type="info"
@@ -69,8 +71,10 @@
         @current-change="getHasSpu"
         @size-change="changeSize"
       />
-    </el-card>
-  </div>
+    </div>
+    <SpuForm v-show="scene == 1" @changeScene="changeScene"></SpuForm>
+    <SkuForm v-show="scene == 2"></SkuForm>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -78,9 +82,11 @@ import { ref, watch } from 'vue'
 import useCatoryStore from '@/store/modules/category'
 import { reqHasSpu } from '@/api/product/spu'
 import type { HasSpuResponseData, Records } from '@/api/product/spu/type'
+import SpuForm from './spuForm.vue'
+import SkuForm from './skuForm.vue'
 
 let categoryStore = useCatoryStore()
-let scene = ref<number>(0) //card组件内容切换变量；0：table，1：添加与修改
+let scene = ref<number>(0) //card组件内容切换变量，012
 let pageNo = ref<number>(1)
 let pageSize = ref<number>(3)
 let records = ref<Records>([])
@@ -109,6 +115,18 @@ const getHasSpu = async (pager = 1) => {
 
 const changeSize = () => {
   getHasSpu()
+}
+//添加新的SPU
+const addSpu = () => {
+  scene.value = 1
+}
+//修改已有SPU
+const updateSpu = () => {
+  scene.value = 1
+}
+//子组件SpuForm绑定自定义事件
+const changeScene = (num: number) => {
+  scene.value = num
 }
 </script>
 
