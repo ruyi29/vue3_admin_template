@@ -110,6 +110,7 @@ const getHasSpu = async (pager = 1) => {
   if (res.code == 200) {
     records.value = res.data.records
     total.value = res.data.total
+    console.log(records)
   }
 }
 
