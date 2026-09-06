@@ -6,6 +6,7 @@ import type {
   SpuHasImg,
   SaleAttrResponseData,
   HasSaleAttrResponse,
+  SpuData,
 } from './type'
 
 const API = {
@@ -19,6 +20,10 @@ const API = {
   SPUHASSALEATTR_URL: '/admin/product/spuSaleAttrList/',
   //获取所有销售属性列表
   ALLSALEATTR_URL: '/admin/product/baseSaleAttrList',
+  //追加新的SPU
+  ADDSPU_URL: '/admin/product/saveSpuInfo',
+  //更新已有的SPU
+  UPDATESPU_URL: '/admin/product/saveSpuInfo',
 }
 
 export const reqHasSpu = (
@@ -37,3 +42,7 @@ export const reqSpuHasSaleAttr = (spuId: number) =>
   request.get<any, SaleAttrResponseData>(API.SPUHASSALEATTR_URL + spuId)
 export const reqAllSaleAttr = () =>
   request.get<any, HasSaleAttrResponse>(API.ALLSALEATTR_URL)
+export const reqAddOrUpdateSpu = (data: SpuData) => {
+  if (data.id) return request.post<any, any>(API.UPDATESPU_URL, data)
+  else request.post<any, any>(API.ADDSPU_URL, data)
+}
