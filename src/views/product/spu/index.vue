@@ -40,7 +40,7 @@
               size="small"
               icon="Edit"
               title="修改SPU"
-              @click="updateSpu"
+              @click="updateSpu(row)"
             ></el-button>
             <el-button
               type="info"
@@ -72,7 +72,7 @@
         @size-change="changeSize"
       />
     </div>
-    <SpuForm v-show="scene == 1" @changeScene="changeScene"></SpuForm>
+    <SpuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></SpuForm>
     <SkuForm v-show="scene == 2"></SkuForm>
   </el-card>
 </template>
@@ -84,6 +84,7 @@ import { reqHasSpu } from '@/api/product/spu'
 import type { HasSpuResponseData, Records } from '@/api/product/spu/type'
 import SpuForm from './spuForm.vue'
 import SkuForm from './skuForm.vue'
+import type { SpuData } from '@/api/product/spu/type'
 
 let categoryStore = useCatoryStore()
 let scene = ref<number>(0) //card组件内容切换变量，012
@@ -91,6 +92,7 @@ let pageNo = ref<number>(1)
 let pageSize = ref<number>(3)
 let records = ref<Records>([])
 let total = ref<number>(0)
+let spu = ref<any>()
 
 watch(
   () => categoryStore.c3Id,
@@ -110,7 +112,6 @@ const getHasSpu = async (pager = 1) => {
   if (res.code == 200) {
     records.value = res.data.records
     total.value = res.data.total
-    console.log(records)
   }
 }
 
@@ -122,8 +123,10 @@ const addSpu = () => {
   scene.value = 1
 }
 //修改已有SPU
-const updateSpu = () => {
+const updateSpu = (row: SpuData) => {
   scene.value = 1
+  //调用子组件内的方法
+  spu.value.initHasSpuData(row)
 }
 //子组件SpuForm绑定自定义事件
 const changeScene = (num: number) => {
