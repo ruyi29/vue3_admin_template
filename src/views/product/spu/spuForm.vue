@@ -24,17 +24,27 @@
       ></el-input>
     </el-form-item>
     <el-form-item label="SPU图标">
+      <!-- v-model:fileList->展示默认图片
+        action:上传图片的接口地址
+        list-type:文件列表的类型 
+      -->
       <el-upload
-        v-model:file-list="fileList"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        v-model:file-list="imgList"
+        action="/api/admin/product/fileUpload"
         list-type="picture-card"
         :on-preview="handlePictureCardPreview"
         :on-remove="handleRemove"
+        :before-upload="handlerUpload"
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
       <el-dialog v-model="dialogVisible">
-        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        <img
+          w-full
+          :src="dialogImageUrl"
+          alt="Preview Image"
+          style="width: 100%; height: 100%"
+        />
       </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
@@ -84,6 +94,7 @@ import {
   reqSpuHasSaleAttr,
   reqAllSaleAttr,
 } from '@/api/product/spu/index'
+import { ElMessage } from 'element-plus'
 
 let $emit = defineEmits(['changeScene'])
 //存储已有的SPU数据
@@ -99,6 +110,8 @@ let spuParams = ref<SpuData>({
   spuImageList: [],
   spuSaleAttrList: [],
 })
+let dialogVisible = ref<boolean>(false) //控制照片墙对话框的显示隐藏
+let dialogImageUrl = ref<string>('') //存储预览图片的地址
 
 const cancel = () => {
   $emit('changeScene', 0)
@@ -111,13 +124,38 @@ const initHasSpuData = async (spu: SpuData) => {
   allTradeMark.value = res.data
   //获取品牌下全部售卖商品的图片
   let res1: SpuHasImg = await reqSpuImageList(spu.id as number)
-  imgList.value = res1.data
+  imgList.value = res1.data.map((item) => {
+    return {
+      name: item.imgName,
+      url: item.imgUrl,
+    }
+  })
   //获取已有SPU的所有属性
   let res2: SaleAttrResponseData = await reqSpuHasSaleAttr(spu.id as number)
   saleAttr.value = res2.data
   //获取全部项目所有销售属性
   let res3: HasSaleAttrResponse = await reqAllSaleAttr()
   allSaleAttr.value = res3.data
+}
+//照片墙点击预览按钮触发的钩子
+const handlePictureCardPreview = (file: any) => {
+  dialogImageUrl.value = file.url
+  dialogVisible.value = true
+}
+//照片墙点击删除按钮触发的钩子
+const handleRemove = () => {}
+//照片墙上传图片成功之后的钩子，约束文件的大小与类型
+const handlerUpload = (file: any) => {
+  if (
+    file.type == 'image/png' ||
+    file.type == 'image/jpg' ||
+    file.type == 'image/gif'
+  ) {
+    if (file.size / 1024 / 1024 < 3) return true
+    else ElMessage.error('上传的文件大小必须小于3M')
+    return false
+  } else ElMessage.error('上传的文件必须是PNG|JPG|GIF')
+  return false
 }
 defineExpose({ initHasSpuData })
 </script>
