@@ -34,7 +34,7 @@
               size="small"
               icon="Plus"
               title="添加SKU"
-              @click="addSku"
+              @click="addSku(row)"
             ></el-button>
             <el-button
               type="warning"
@@ -163,8 +163,10 @@ const removeSpu = async (spuId: number) => {
   }
 }
 //添加SKU
-const addSku = () => {
+const addSku = (row: SpuData) => {
   scene.value = 2
+  //调用子组件方法进行初始化
+  sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
 }
 </script>
 
