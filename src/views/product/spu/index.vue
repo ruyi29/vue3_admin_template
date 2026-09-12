@@ -34,6 +34,7 @@
               size="small"
               icon="Plus"
               title="添加SKU"
+              @click="addSku"
             ></el-button>
             <el-button
               type="warning"
@@ -76,7 +77,7 @@
       />
     </div>
     <SpuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></SpuForm>
-    <SkuForm v-show="scene == 2"></SkuForm>
+    <SkuForm ref="sku" v-show="scene == 2" @changeScene="changeScene"></SkuForm>
   </el-card>
 </template>
 
@@ -97,6 +98,7 @@ let pageSize = ref<number>(3)
 let records = ref<Records>([])
 let total = ref<number>(0)
 let spu = ref<any>()
+let sku = ref<any>()
 
 watch(
   () => categoryStore.c3Id,
@@ -150,6 +152,7 @@ const changeScene = async (obj: any) => {
     getHasSpu(lastPage)
   }
 }
+//删除SPU
 const removeSpu = async (spuId: number) => {
   let res = await reqDeleteSpu(spuId)
   if (res.code == 200) {
@@ -158,6 +161,10 @@ const removeSpu = async (spuId: number) => {
   } else {
     ElMessage.error('删除SPU失败')
   }
+}
+//添加SKU
+const addSku = () => {
+  scene.value = 2
 }
 </script>
 
