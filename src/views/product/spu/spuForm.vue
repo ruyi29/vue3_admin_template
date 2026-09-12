@@ -52,18 +52,40 @@
         <el-option label="hua"></el-option>
       </el-select>
       <el-button type="primary" icon="Plus">添加属性值</el-button>
-      <el-table border style="margin: 10px 0px">
+      <el-table border style="margin: 10px 0px" :data="saleAttr">
         <el-table-column
           label="序号"
           type="index"
           align="center"
           width="80px"
         ></el-table-column>
-        <el-table-column label="属性名" width="120px"></el-table-column>
-        <el-table-column label="属性值"></el-table-column>
+        <el-table-column
+          label="属性名"
+          width="120px"
+          prop="saleAttrName"
+        ></el-table-column>
+        <el-table-column label="属性值">
+          <template #="{ row }">
+            <el-tag
+              v-for="item in row.spuSaleAttrValueList"
+              :key="row.id"
+              class="mx-1"
+              closable
+              style="margin-right: 5px; margin-top: 5px; margin-bottom: 5px"
+            >
+              {{ item.saleAttrValueName }}
+            </el-tag>
+            <el-button icon="Plus" type="primary" size="small"></el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120px">
-          <template #>
-            <el-button type="danger" size="small" icon="Delete"></el-button>
+          <template #="{ row, $index }">
+            <el-button
+              type="danger"
+              size="small"
+              icon="Delete"
+              @click="saleAttr.splice($index, 1)"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
