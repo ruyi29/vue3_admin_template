@@ -23,7 +23,7 @@ const API = {
   //追加新的SPU
   ADDSPU_URL: '/admin/product/saveSpuInfo',
   //更新已有的SPU
-  UPDATESPU_URL: '/admin/product/saveSpuInfo',
+  UPDATESPU_URL: '/admin/product/updateSpuInfo',
 }
 
 export const reqHasSpu = (

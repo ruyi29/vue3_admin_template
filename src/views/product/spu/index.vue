@@ -131,6 +131,7 @@ const updateSpu = (row: SpuData) => {
 //子组件SpuForm绑定自定义事件
 const changeScene = (num: number) => {
   scene.value = num
+  getHasSpu()
 }
 </script>
 

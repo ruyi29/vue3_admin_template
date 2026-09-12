@@ -127,7 +127,13 @@
       </el-table>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary">保存</el-button>
+      <el-button
+        :disabled="saleAttr.length > 0 ? false : true"
+        type="primary"
+        @click="save"
+      >
+        保存
+      </el-button>
       <el-button @click="cancel">取消</el-button>
     </el-form-item>
   </el-form>
@@ -152,6 +158,7 @@ import {
   reqSpuImageList,
   reqSpuHasSaleAttr,
   reqAllSaleAttr,
+  reqAddOrUpdateSpu,
 } from '@/api/product/spu/index'
 import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
@@ -269,8 +276,29 @@ const toLook = (row: SaleAttr) => {
   //追加新的属性值对象
   row.spuSaleAttrValueList.push(newSaleAttrValue)
   row.flag = false
+  row.saleAttrValue = ''
 }
-
+const save = async () => {
+  //整理参数
+  //1:照片墙的数据
+  spuParams.value.spuImageList = imgList.value.map((item: any) => {
+    return {
+      imgName: item.name, //图片的名字
+      imgUrl: item.response?.data || item.url,
+    }
+  })
+  //2:整理销售属性的数据
+  spuParams.value.spuSaleAttrList = saleAttr.value
+  //发请求:添加SPU|更新已有的SPU
+  let res = await reqAddOrUpdateSpu(spuParams.value)
+  console.log(res)
+  //成功
+  if (res.code == 200) {
+    $emit('changeScene', 0)
+    ElMessage.success(spuParams.value.id ? '更新成功' : '添加成功')
+  } else ElMessage.error(spuParams.value.id ? '更新失败' : '添加失败')
+  //失败
+}
 defineExpose({ initHasSpuData })
 </script>
 
