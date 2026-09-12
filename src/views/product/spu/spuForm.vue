@@ -48,10 +48,30 @@
       </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
-      <el-select style="width: 200px; margin-right: 10px">
-        <el-option label="hua"></el-option>
+      <el-select
+        v-model="saleAttrIdAndValueName"
+        style="width: 200px; margin-right: 10px"
+        :placeholder="
+          unSelectSaleAttr.length
+            ? `还未选择${unSelectSaleAttr.length}个`
+            : '无'
+        "
+      >
+        <el-option
+          :value="`${item.id}:${item.name}`"
+          v-for="item in unSelectSaleAttr"
+          :label="item.name"
+          :key="item.id"
+        ></el-option>
       </el-select>
-      <el-button type="primary" icon="Plus">添加属性值</el-button>
+      <el-button
+        @click="addSaleAttr"
+        :disabled="saleAttrIdAndValueName ? false : true"
+        type="primary"
+        icon="Plus"
+      >
+        添加属性
+      </el-button>
       <el-table border style="margin: 10px 0px" :data="saleAttr">
         <el-table-column
           label="序号"
@@ -98,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type {
   SpuData,
   AllTradeMark,
@@ -134,6 +154,7 @@ let spuParams = ref<SpuData>({
 })
 let dialogVisible = ref<boolean>(false) //控制照片墙对话框的显示隐藏
 let dialogImageUrl = ref<string>('') //存储预览图片的地址
+let saleAttrIdAndValueName = ref<string>('') //将来收集还未选择的销售属性的ID与属性值的名字
 
 const cancel = () => {
   $emit('changeScene', 0)
@@ -178,6 +199,29 @@ const handlerUpload = (file: any) => {
     return false
   } else ElMessage.error('上传的文件必须是PNG|JPG|GIF')
   return false
+}
+//计算出当前SPU还未拥有的销售属性
+let unSelectSaleAttr = computed(() => {
+  //全部销售属性:颜色、版本、尺码
+  //己有的销售属性:颜色、版本
+  let unSelectArr = allSaleAttr.value.filter((item) => {
+    return saleAttr.value.every((item1) => {
+      return item.name != item1.saleAttrName
+    })
+  })
+  return unSelectArr
+})
+//添加销售属性
+const addSaleAttr = () => {
+  const [baseSaleAttrId, saleAttrName] = saleAttrIdAndValueName.value.split(':') //准备一个新的销售属性对象:将来带给服务器即可
+  let newSaleAttr: SaleAttr = {
+    baseSaleAttrId: Number(baseSaleAttrId),
+    saleAttrName,
+    spuSaleAttrValueList: [],
+  }
+  //追加到数组当中
+  saleAttr.value.push(newSaleAttr)
+  saleAttrIdAndValueName.value = ''
 }
 defineExpose({ initHasSpuData })
 </script>
