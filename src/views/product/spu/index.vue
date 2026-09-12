@@ -48,7 +48,10 @@
               icon="View"
               title="查看SKU列表"
             ></el-button>
-            <el-popconfirm :title="`您确定删除“${row.spuName}”吗？`">
+            <el-popconfirm
+              :title="`您确定删除“${row.spuName}”吗？`"
+              @confirm="removeSpu(row.id)"
+            >
               <template #reference>
                 <el-button
                   type="danger"
@@ -80,11 +83,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import useCatoryStore from '@/store/modules/category'
-import { reqHasSpu } from '@/api/product/spu'
+import { reqHasSpu, reqDeleteSpu } from '@/api/product/spu'
 import type { HasSpuResponseData, Records } from '@/api/product/spu/type'
 import SpuForm from './spuForm.vue'
 import SkuForm from './skuForm.vue'
 import type { SpuData } from '@/api/product/spu/type'
+import { ElMessage } from 'element-plus'
 
 let categoryStore = useCatoryStore()
 let scene = ref<number>(0) //card组件内容切换变量，012
@@ -121,6 +125,7 @@ const changeSize = () => {
 //添加新的SPU
 const addSpu = () => {
   scene.value = 1
+  spu.value.initAddSpu(categoryStore.c3Id)
 }
 //修改已有SPU
 const updateSpu = (row: SpuData) => {
@@ -129,9 +134,30 @@ const updateSpu = (row: SpuData) => {
   spu.value.initHasSpuData(row)
 }
 //子组件SpuForm绑定自定义事件
-const changeScene = (num: number) => {
-  scene.value = num
-  getHasSpu()
+const changeScene = async (obj: any) => {
+  scene.value = obj.flag
+  if (obj.params == 'update') {
+    //更新留在当前页
+    getHasSpu(pageNo.value)
+  } else {
+    //添加留在最新页
+    let res: HasSpuResponseData = await reqHasSpu(
+      1,
+      pageSize.value,
+      categoryStore.c3Id,
+    )
+    const lastPage = Math.ceil(res.data.total / pageSize.value)
+    getHasSpu(lastPage)
+  }
+}
+const removeSpu = async (spuId: number) => {
+  let res = await reqDeleteSpu(spuId)
+  if (res.code == 200) {
+    ElMessage.success('删除SPU成功')
+    getHasSpu(pageNo.value)
+  } else {
+    ElMessage.error('删除SPU失败')
+  }
 }
 </script>
 

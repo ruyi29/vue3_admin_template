@@ -184,7 +184,7 @@ const userStore = useUserStore()
 const headers = { Token: userStore.token }
 
 const cancel = () => {
-  $emit('changeScene', 0)
+  $emit('changeScene', { flag: 0, params: 'update' })
 }
 const initHasSpuData = async (spu: SpuData) => {
   //spu:即为父组件传递过来的已有的SPU对象[不完整]
@@ -291,15 +291,42 @@ const save = async () => {
   spuParams.value.spuSaleAttrList = saleAttr.value
   //发请求:添加SPU|更新已有的SPU
   let res = await reqAddOrUpdateSpu(spuParams.value)
-  console.log(res)
   //成功
-  if (res.code == 200) {
-    $emit('changeScene', 0)
+  if (res && res.code == 200) {
+    $emit('changeScene', {
+      flag: 0,
+      params: spuParams.value.id ? 'update' : 'add',
+    })
     ElMessage.success(spuParams.value.id ? '更新成功' : '添加成功')
   } else ElMessage.error(spuParams.value.id ? '更新失败' : '添加失败')
   //失败
 }
-defineExpose({ initHasSpuData })
+//添加一个新的SPU初始化请求方法
+const initAddSpu = async (c3Id: number | string) => {
+  //清空数据
+  Object.assign(spuParams.value, {
+    category3Id: '', //收集三级分类的ID
+    spuName: '', //SPU的名字
+    description: '', //SPU的描述
+    tmId: '', //品牌的ID
+    spuImageList: [],
+    spuSaleAttrList: [],
+  })
+  delete spuParams.value.id
+  //清空照片和销售属性
+  imgList.value = []
+  saleAttr.value = []
+  saleAttrIdAndValueName.value = ''
+  //存储三级分类的ID
+  spuParams.value.category3Id = c3Id
+  //获取全部品牌的数据
+  let res: AllTradeMark = await reqAllTradeMark()
+  let res1: HasSaleAttrResponse = await reqAllSaleAttr()
+  //存储数据
+  allTradeMark.value = res.data
+  allSaleAttr.value = res1.data
+}
+defineExpose({ initHasSpuData, initAddSpu })
 </script>
 
 <style scoped></style>

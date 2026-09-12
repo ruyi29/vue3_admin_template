@@ -24,6 +24,8 @@ const API = {
   ADDSPU_URL: '/admin/product/saveSpuInfo',
   //更新已有的SPU
   UPDATESPU_URL: '/admin/product/updateSpuInfo',
+  //删除已有SPU
+  DELETESPU_URL: '/admin/product/deleteSpu/',
 }
 
 export const reqHasSpu = (
@@ -44,5 +46,7 @@ export const reqAllSaleAttr = () =>
   request.get<any, HasSaleAttrResponse>(API.ALLSALEATTR_URL)
 export const reqAddOrUpdateSpu = (data: SpuData) => {
   if (data.id) return request.post<any, any>(API.UPDATESPU_URL, data)
-  else request.post<any, any>(API.ADDSPU_URL, data)
+  else return request.post<any, any>(API.ADDSPU_URL, data)
 }
+export const reqDeleteSpu = (spuId: number) =>
+  request.delete<any, any>(API.DELETESPU_URL + spuId)
