@@ -35,6 +35,7 @@
         :on-preview="handlePictureCardPreview"
         :on-remove="handleRemove"
         :before-upload="handlerUpload"
+        :headers="headers"
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
@@ -87,15 +88,30 @@
         <el-table-column label="属性值">
           <template #="{ row }">
             <el-tag
-              v-for="item in row.spuSaleAttrValueList"
-              :key="row.id"
+              v-for="(item, index) in row.spuSaleAttrValueList"
+              :key="item.id"
               class="mx-1"
               closable
               style="margin-right: 5px; margin-top: 5px; margin-bottom: 5px"
+              @close="row.spuSaleAttrValueList.splice(index, 1)"
             >
               {{ item.saleAttrValueName }}
             </el-tag>
-            <el-button icon="Plus" type="primary" size="small"></el-button>
+            <el-input
+              @blur="toLook(row)"
+              v-model="row.saleAttrValue"
+              v-if="row.flag == true"
+              placeholder="请输入属性值"
+              size="small"
+              style="width: 100px"
+            ></el-input>
+            <el-button
+              @click="toEdit(row)"
+              v-else
+              icon="Plus"
+              type="primary"
+              size="small"
+            ></el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120px">
@@ -129,6 +145,7 @@ import type {
   SpuImg,
   SaleAttr,
   HasSaleAttr,
+  SaleAttrValue,
 } from '@/api/product/spu/type'
 import {
   reqAllTradeMark,
@@ -137,6 +154,7 @@ import {
   reqAllSaleAttr,
 } from '@/api/product/spu/index'
 import { ElMessage } from 'element-plus'
+import useUserStore from '@/store/modules/user'
 
 let $emit = defineEmits(['changeScene'])
 //存储已有的SPU数据
@@ -155,6 +173,8 @@ let spuParams = ref<SpuData>({
 let dialogVisible = ref<boolean>(false) //控制照片墙对话框的显示隐藏
 let dialogImageUrl = ref<string>('') //存储预览图片的地址
 let saleAttrIdAndValueName = ref<string>('') //将来收集还未选择的销售属性的ID与属性值的名字
+const userStore = useUserStore()
+const headers = { Token: userStore.token }
 
 const cancel = () => {
   $emit('changeScene', 0)
@@ -223,6 +243,34 @@ const addSaleAttr = () => {
   saleAttr.value.push(newSaleAttr)
   saleAttrIdAndValueName.value = ''
 }
+const toEdit = (row: SaleAttr) => {
+  row.flag = true
+}
+const toLook = (row: SaleAttr) => {
+  //整理收集的属性的ID与属性值的名字
+  const { baseSaleAttrId, saleAttrValue } = row //整理成服务器需要的属性值形式
+  let newSaleAttrValue: SaleAttrValue = {
+    baseSaleAttrId: Number(baseSaleAttrId),
+    saleAttrValueName: saleAttrValue as string,
+  }
+  //非法情况判断
+  if ((saleAttrValue as string).trim() == '') {
+    ElMessage.error('属性值不能为空')
+    return
+  }
+  //判断属性值是否在数组当中存在
+  let repeat = row.spuSaleAttrValueList.find((item) => {
+    return item.saleAttrValueName == saleAttrValue
+  })
+  if (repeat) {
+    ElMessage.error('属性值重复')
+    return
+  }
+  //追加新的属性值对象
+  row.spuSaleAttrValueList.push(newSaleAttrValue)
+  row.flag = false
+}
+
 defineExpose({ initHasSpuData })
 </script>
 

@@ -71,6 +71,8 @@ export interface SaleAttr {
   baseSaleAttrId: number
   saleAttrName: string
   spuSaleAttrValueList: SpuSaleAttrValueList
+  flag?: boolean
+  saleAttrValue?: string
 }
 export interface SaleAttrResponseData extends ResponseData {
   data: SaleAttr[]
