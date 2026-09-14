@@ -22,6 +22,8 @@ export interface SkuData {
   skuAttrValueList?: Attr[] //平台属性的收集
   skuSaleAttrValueList?: saleArr[] //销售属性
   skuDefaultImg: string //sku图片地址
+  isSale?: number //控制商品的上架与下架
+  id?: number
 }
 
 export interface SkuResponseData extends ResponseData {
