@@ -48,6 +48,7 @@
               size="small"
               icon="View"
               title="查看SKU列表"
+              @click="findSku(row)"
             ></el-button>
             <el-popconfirm
               :title="`您确定删除“${row.spuName}”吗？`"
@@ -78,17 +79,30 @@
     </div>
     <SpuForm ref="spu" v-show="scene == 1" @changeScene="changeScene"></SpuForm>
     <SkuForm ref="sku" v-show="scene == 2" @changeScene="changeScene"></SkuForm>
+    <!-- sku展示对话框 -->
+    <el-dialog title="SKU列表" v-model="show">
+      <el-table border :data="skuArr">
+        <el-table-column label="SKU名字" prop="skuName"></el-table-column>
+        <el-table-column label="SKU价格" prop="price"></el-table-column>
+        <el-table-column label="SKU重量" prop="weight"></el-table-column>
+        <el-table-column label="SKU图片">
+          <template #="{ row }">
+            <img :src="row.skuDefaultImg" style="width: 100px; height: 100px" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </el-card>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import useCatoryStore from '@/store/modules/category'
-import { reqHasSpu, reqDeleteSpu } from '@/api/product/spu'
+import { reqHasSpu, reqDeleteSpu, reqSkuList } from '@/api/product/spu'
 import type { HasSpuResponseData, Records } from '@/api/product/spu/type'
 import SpuForm from './spuForm.vue'
 import SkuForm from './skuForm.vue'
-import type { SpuData } from '@/api/product/spu/type'
+import type { SpuData, SkuInfoData, SkuData } from '@/api/product/spu/type'
 import { ElMessage } from 'element-plus'
 
 let categoryStore = useCatoryStore()
@@ -99,6 +113,8 @@ let records = ref<Records>([])
 let total = ref<number>(0)
 let spu = ref<any>()
 let sku = ref<any>()
+let skuArr = ref<SkuData[]>([])
+let show = ref<boolean>(false)
 
 watch(
   () => categoryStore.c3Id,
@@ -167,6 +183,15 @@ const addSku = (row: SpuData) => {
   scene.value = 2
   //调用子组件方法进行初始化
   sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
+}
+//查看SKU列表
+const findSku = async (row: SpuData) => {
+  let res: SkuInfoData = await reqSkuList(row.id as number)
+  if (res.code == 200) {
+    skuArr.value = res.data
+    show.value = true
+  } else {
+  }
 }
 </script>
 

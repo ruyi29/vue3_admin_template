@@ -8,6 +8,7 @@ import type {
   HasSaleAttrResponse,
   SpuData,
   SkuData,
+  SkuInfoData,
 } from './type'
 
 const API = {
@@ -29,6 +30,8 @@ const API = {
   DELETESPU_URL: '/admin/product/deleteSpu/',
   //添加新的SKU
   ADDSKU_URL: '/admin/product/saveSkuInfo',
+  //查看某一个SPU下的sku
+  SKUINFO_URL: '/admin/product/findBySpuId/',
 }
 
 export const reqHasSpu = (
@@ -55,3 +58,5 @@ export const reqDeleteSpu = (spuId: number) =>
   request.delete<any, any>(API.DELETESPU_URL + spuId)
 export const reqAddSku = (data: SkuData) =>
   request.post<any, any>(API.ADDSKU_URL, data)
+export const reqSkuList = (spuId: number) =>
+  request.get<any, SkuInfoData>(API.SKUINFO_URL + spuId)

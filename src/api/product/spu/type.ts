@@ -105,3 +105,7 @@ export interface SkuData {
   skuSaleAttrValueList?: saleArr[] //销售属性
   skuDefaultImg: string //sku图片地址
 }
+
+export interface SkuInfoData extends ResponseData {
+  data: SkuData[]
+}
