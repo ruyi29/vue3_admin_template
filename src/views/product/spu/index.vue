@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import useCatoryStore from '@/store/modules/category'
 import { reqHasSpu, reqDeleteSpu, reqSkuList } from '@/api/product/spu'
 import type { HasSpuResponseData, Records } from '@/api/product/spu/type'
@@ -193,6 +193,10 @@ const findSku = async (row: SpuData) => {
   } else {
   }
 }
+//路由跳转前清空数据
+onBeforeUnmount(() => {
+  categoryStore.$reset()
+})
 </script>
 
 <style scoped></style>
