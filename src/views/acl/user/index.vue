@@ -13,20 +13,52 @@
   <el-card style="margin: 10px 0">
     <el-button type="primary">添加用户</el-button>
     <el-button type="danger">批量删除</el-button>
-    <el-table style="margin: 10px 0" border>
+    <el-table style="margin: 10px 0" border :data="userArr">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="#" type="index" align="center"></el-table-column>
-      <el-table-column label="ID" align="center"></el-table-column>
-      <el-table-column label="用户名字" align="center"></el-table-column>
-      <el-table-column label="用户名称" align="center"></el-table-column>
-      <el-table-column label="用户角色" align="center"></el-table-column>
-      <el-table-column label="创建时间" align="center"></el-table-column>
-      <el-table-column label="更新时间" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="260px">
+      <el-table-column
+        label="ID"
+        align="center"
+        prop="id"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        label="用户名字"
+        align="center"
+        prop="username"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        label="用户名称"
+        align="center"
+        prop="name"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        label="用户角色"
+        align="center"
+        prop="roleName"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        label="更新时间"
+        align="center"
+        prop="updateTime"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column label="操作" align="center" width="270px">
         <template #>
-          <el-button type="primary" icon="">分配角色</el-button>
-          <el-button type="primary" icon="Edit">编辑</el-button>
-          <el-button type="primary" icon="Delete">删除</el-button>
+          <el-button type="primary" icon="User" size="small">
+            分配角色
+          </el-button>
+          <el-button type="primary" icon="Edit" size="small">编辑</el-button>
+          <el-button type="primary" icon="Delete" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -36,16 +68,40 @@
       :page-sizes="[5, 7, 9, 11]"
       :background="true"
       layout="prev, pager, next, jumper, ->, sizes, total"
-      :total="100"
+      :total="total"
+      @current-change="getHasUser"
+      @size-change="handler"
     ></el-pagination>
   </el-card>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { reqUserInfo } from '@/api/acl/user/index'
+import type { UserResponseData, Records } from '@/api/acl/user/type'
+import { ElMessage } from 'element-plus'
 
 let pageNo = ref<number>(1)
 let pageSize = ref<number>(5)
+let total = ref<number>(0)
+let userArr = ref<Records>([])
+
+onMounted(() => {
+  getHasUser()
+})
+const getHasUser = async (pager = 1) => {
+  pageNo.value = pager
+  let res: UserResponseData = await reqUserInfo(pageNo.value, pageSize.value)
+  if (res.code == 200) {
+    total.value = res.data.total
+    userArr.value = res.data.records
+  } else {
+    ElMessage.error('获取用户信息失败')
+  }
+}
+const handler = () => {
+  getHasUser()
+}
 </script>
 
 <style scoped>
