@@ -9,6 +9,7 @@ const API = {
   SALE_URL: '/admin/product/onSale/',
   //下架
   CANCELSALE_URL: '/admin/product/cancelSale/',
+  //
 }
 
 export const reqSkuList = (page: number, limit: number) =>
