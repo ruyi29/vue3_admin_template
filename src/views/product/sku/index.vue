@@ -54,7 +54,15 @@
             icon="InfoFilled"
             @click="findSku(row)"
           ></el-button>
-          <el-button size="small" type="danger" icon="Delete"></el-button>
+          <el-popconfirm
+            :title="`您确定要删除“${row.skuName}”吗?`"
+            @confirm="deleteSku(row.id)"
+            width="200px"
+          >
+            <template #reference>
+              <el-button size="small" type="danger" icon="Delete"></el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -113,7 +121,12 @@
         <el-row style="margin: 10px 0">
           <el-col :span="6">商品图片</el-col>
           <el-col :span="18">
-            <el-carousel :interval="4000" type="card" height="200px">
+            <el-carousel
+              :interval="4000"
+              type="card"
+              height="200px"
+              indicator-position="outside"
+            >
               <el-carousel-item
                 v-for="item in skuInfo.skuImageList"
                 :key="item.id"
@@ -135,6 +148,7 @@ import {
   reqSaleSku,
   reqCancelSale,
   reqSkuInfo,
+  reqDeleteSku,
 } from '@/api/product/sku/index'
 import type {
   SkuResponseData,
@@ -186,6 +200,15 @@ const findSku = async (row: SkuData) => {
   let res: SkuInfoData = await reqSkuInfo(row.id as number)
   skuInfo.value = res.data
   console.log(skuInfo.value)
+}
+const deleteSku = async (id: number) => {
+  let res = await reqDeleteSku(id)
+  if (res.code == 200) {
+    ElMessage.success('删除SKU成功')
+    getHasSku(pageNo.value)
+  } else {
+    ElMessage.error('删除SKU失败')
+  }
 }
 </script>
 

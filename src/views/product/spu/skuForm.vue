@@ -128,6 +128,18 @@ const initSkuData = async (
   c2Id: number | string,
   spu: any,
 ) => {
+  Object.assign(skuParams, {
+    category3Id: '', //三级分类的ID
+    spuId: '', //已有的SPU的ID
+    tmId: '', //SPU品牌的ID
+    skuName: '', //sku名字
+    price: '', //sku价格
+    weight: '', //sku重量
+    skuDesc: '', //sku的描述
+    skuAttrValueList: [], //平台属性的收集
+    skuSaleAttrValueList: [], //销售属性
+    skuDefaultImg: '',
+  })
   //收集数据
   skuParams.category3Id = spu.category3Id
   skuParams.spuId = spu.id
