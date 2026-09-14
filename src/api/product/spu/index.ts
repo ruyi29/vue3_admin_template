@@ -7,6 +7,7 @@ import type {
   SaleAttrResponseData,
   HasSaleAttrResponse,
   SpuData,
+  SkuData,
 } from './type'
 
 const API = {
@@ -26,6 +27,8 @@ const API = {
   UPDATESPU_URL: '/admin/product/updateSpuInfo',
   //删除已有SPU
   DELETESPU_URL: '/admin/product/deleteSpu/',
+  //添加新的SKU
+  ADDSKU_URL: '/admin/product/saveSkuInfo',
 }
 
 export const reqHasSpu = (
@@ -50,3 +53,5 @@ export const reqAddOrUpdateSpu = (data: SpuData) => {
 }
 export const reqDeleteSpu = (spuId: number) =>
   request.delete<any, any>(API.DELETESPU_URL + spuId)
+export const reqAddSku = (data: SkuData) =>
+  request.post<any, any>(API.ADDSKU_URL, data)
