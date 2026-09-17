@@ -53,7 +53,7 @@
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column label="操作" align="center" width="270px">
-        <template #>
+        <template #="{ row }">
           <el-button type="primary" icon="User" size="small">
             分配角色
           </el-button>
@@ -88,28 +88,37 @@
     <template #default>
       <el-form>
         <el-form-item label="用户姓名">
-          <el-input placeholder="请您输入用户姓名"></el-input>
+          <el-input
+            placeholder="请您输入用户姓名"
+            v-model="userParams.username"
+          ></el-input>
         </el-form-item>
         <el-form-item label="用户名称">
-          <el-input placeholder="请您输入用户名称"></el-input>
+          <el-input
+            placeholder="请您输入用户名称"
+            v-model="userParams.name"
+          ></el-input>
         </el-form-item>
         <el-form-item label="用户密码">
-          <el-input placeholder="请您输入用户密码"></el-input>
+          <el-input
+            placeholder="请您输入用户密码"
+            v-model="userParams.password"
+          ></el-input>
         </el-form-item>
       </el-form>
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button type="primary">确定</el-button>
-        <el-button>取消</el-button>
+        <el-button type="primary" @click="save">确定</el-button>
+        <el-button @click="cancel">取消</el-button>
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { reqUserInfo } from '@/api/acl/user/index'
+import { ref, onMounted, reactive } from 'vue'
+import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user/index'
 import type { UserResponseData, Records, User } from '@/api/acl/user/type'
 import { ElMessage } from 'element-plus'
 
@@ -118,6 +127,11 @@ let pageSize = ref<number>(5)
 let total = ref<number>(0)
 let userArr = ref<Records>([])
 let drawer = ref<boolean>(false) //控制添加、更新用户的抽屉
+let userParams = reactive<User>({
+  username: '',
+  name: '',
+  password: '',
+})
 
 onMounted(() => {
   getHasUser()
@@ -137,11 +151,35 @@ const handler = () => {
 }
 //添加用户
 const addUser = () => {
+  Object.assign(userParams, {
+    username: '',
+    name: '',
+    password: '',
+  })
   drawer.value = true
 }
 //更新用户
 const updateUser = (row: User) => {
   drawer.value = true
+}
+//保存按钮（添加、更新）
+const save = async () => {
+  console.log(111)
+  let res: any = await reqAddOrUpdateUser(userParams)
+  console.log(res)
+  if (res.code == 200) {
+    drawer.value = false
+    ElMessage.success(userParams.id ? '更新成功' : '添加成功')
+    const lastPage = Math.ceil((total.value + 1) / pageSize.value)
+    getHasUser(userParams.id ? pageNo.value : lastPage)
+  } else {
+    drawer.value = false
+    ElMessage.error(userParams.id ? '更新失败' : '添加失败')
+  }
+}
+//取消按钮
+const cancel = () => {
+  drawer.value = false
 }
 </script>
 
