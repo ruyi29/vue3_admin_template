@@ -146,7 +146,7 @@
               :key="index"
               :label="role"
             >
-              {{ role }}
+              {{ role.roleName }}
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -154,8 +154,8 @@
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button type="primary" @click="save">确定</el-button>
-        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="confirmClick">确定</el-button>
+        <el-button @click="drawer1 = false">取消</el-button>
       </div>
     </template>
   </el-drawer>
@@ -163,8 +163,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user/index'
-import type { UserResponseData, Records, User } from '@/api/acl/user/type'
+import {
+  reqUserInfo,
+  reqAddOrUpdateUser,
+  reqAllRole,
+  reqSetRole,
+} from '@/api/acl/user/index'
+import type {
+  UserResponseData,
+  Records,
+  User,
+  AllRoleResponseData,
+  AllRole,
+  SetRoleData,
+} from '@/api/acl/user/type'
 import { ElMessage } from 'element-plus'
 
 let pageNo = ref<number>(1)
@@ -179,6 +191,10 @@ let userParams = reactive<User>({
   password: '',
 })
 let formRef = ref<any>()
+let allRole = ref<AllRole>([])
+let userRole = ref<AllRole>([])
+let checkAll = ref<boolean>(false)
+const isIndeterminate = ref<boolean>(true)
 
 onMounted(() => {
   getHasUser()
@@ -233,7 +249,7 @@ const save = async () => {
     ElMessage.error(userParams.id ? '更新失败' : '添加失败')
   }
 }
-//取消按钮
+//取消按钮（更新、添加用户）
 const cancel = () => {
   drawer.value = false
 }
@@ -255,17 +271,15 @@ const rules = {
   name: [{ required: true, trigger: 'blur', validator: validatorName }],
   password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
 }
-const setRole = (row: User) => {
-  drawer1.value = true
+const setRole = async (row: User) => {
   Object.assign(userParams, row)
+  let res: AllRoleResponseData = await reqAllRole(userParams.id as number)
+  if (res.code == 200) {
+    allRole.value = res.data.allRolesList
+    userRole.value = res.data.assignRoles
+    drawer1.value = true
+  }
 }
-//测试复选框代码
-//全选复选框收集数据：是否全选
-let checkAll = ref<boolean>(false)
-let allRole = ref(['销售', '前台', '财务', 'boss'])
-let userRole = ref(['销售', '前台'])
-//设置不确定状态，仅负责样式控制
-const isIndeterminate = ref<boolean>(true)
 //全选复选框的chang事件
 const handleCheckAllChange = (val: boolean) => {
   userRole.value = val ? allRole.value : []
@@ -278,6 +292,21 @@ const handleCheckedCitiesChange = (value: string[]) => {
   checkAll.value = checkedCount === allRole.value.length
   //顶部的复选框不确定的样式
   isIndeterminate.value = !(checkedCount === allRole.value.length)
+}
+//分配角色确定按钮
+const confirmClick = async () => {
+  let data: SetRoleData = {
+    userId: userParams.id as number,
+    roleIdList: userRole.value.map((item) => item.id as number),
+  }
+  let res = await reqSetRole(data)
+  if (res.code == 200) {
+    ElMessage.success('分配角色成功')
+    drawer1.value = false
+    getHasUser(pageNo.value)
+  } else {
+    ElMessage.error('分配角色失败')
+  }
 }
 </script>
 
