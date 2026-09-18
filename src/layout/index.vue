@@ -73,7 +73,7 @@ export default {
     height: 100vh;
     background: $base-menu-background;
     color: white;
-    transition: all 0.3s;
+    transition: width 0.3s;
 
     .scrollbar {
       width: 100%;
@@ -91,7 +91,9 @@ export default {
     height: $base-tabbar-height;
     top: 0;
     left: $base-menu-width;
-    transition: all 0.3s;
+    transition:
+      width 0.3s,
+      left 0.3s;
     background: white;
 
     &.fold {
@@ -109,12 +111,14 @@ export default {
     left: $base-menu-width;
     overflow: auto;
     padding: 20px;
-    transition: all 0.3s;
+    transition:
+      width 0.3s,
+      left 0.3s;
+  }
 
-    &.fold {
-      width: calc(100vw - $base-menu-min-width);
-      left: $base-menu-min-width;
-    }
+  .layout_main.fold {
+    width: calc(100vw - $base-menu-min-width);
+    left: $base-menu-min-width;
   }
 }
 </style>
