@@ -69,7 +69,7 @@
             编辑
           </el-button>
           <el-popconfirm
-            :title="`您确定要删除“${row.rolename}”吗？`"
+            :title="`您确定要删除“${row.roleName}”吗？`"
             width="260px"
             @confirm="deleteRole(row.id)"
           >
@@ -93,13 +93,31 @@
       @size-change="handler"
     ></el-pagination>
   </el-card>
+  <!-- 对话框：添加与更新角色 -->
+  <el-dialog
+    v-model="dialogVisible"
+    :title="roleParams.id ? '更新角色' : '添加角色'"
+  >
+    <el-form :model="roleParams" :rules="rules" ref="form">
+      <el-form-item label="角色名称" prop="roleName">
+        <el-input
+          placeholder="请您输入角色名称"
+          v-model="roleParams.roleName"
+        ></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="save">确定</el-button>
+      <el-button @click="dialogVisible = false">取消</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { reqRoleInfo } from '@/api/acl/role/index'
-import type { RoleResponseData, Records } from '@/api/acl/role/type'
+import { reqRoleInfo, reqAddOrUpdateRole } from '@/api/acl/role/index'
+import type { RoleResponseData, Records, RoleData } from '@/api/acl/role/type'
 import useLayOutSettingStore from '@/store/modules/setting'
 
 let pageNo = ref<number>(1)
@@ -108,6 +126,11 @@ let total = ref<number>(0)
 let roleArr = ref<Records>([])
 let keyword = ref<string>('') //收集用户搜索框关键字
 let settingStore = useLayOutSettingStore() //获取模版setting仓库
+let dialogVisible = ref<boolean>(false)
+let roleParams = reactive<RoleData>({
+  roleName: '',
+})
+let form = ref<any>()
 
 onMounted(() => {
   getHasRole()
@@ -119,7 +142,6 @@ const getHasRole = async (pager = 1) => {
     pageSize.value,
     keyword.value,
   )
-  console.log(res)
   if (res.code == 200) {
     roleArr.value = res.data.records
     total.value = res.data.total
@@ -131,9 +153,44 @@ const getHasRole = async (pager = 1) => {
 const handler = () => {
   getHasRole()
 }
-const addRole = () => {}
+const addRole = () => {
+  dialogVisible.value = true
+  Object.assign(roleParams, {
+    id: '',
+    roleName: '',
+  })
+  nextTick(() => {
+    form.value?.clearValidate()
+  })
+}
+const validatorRoleName = (rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 2) callBack()
+  else callBack(new Error('角色名称至少两位'))
+}
+const rules = {
+  roleName: [{ required: true, trigger: 'blur', validator: validatorRoleName }],
+}
+const save = async () => {
+  await form.value.validate()
+  let res: any = await reqAddOrUpdateRole(roleParams)
+  if (res.code == 200) {
+    dialogVisible.value = false
+    ElMessage.success(roleParams.id ? '更新角色成功' : '添加角色成功')
+    const lastPage = Math.ceil((total.value + 1) / pageSize.value)
+    getHasRole(roleParams.id ? pageNo.value : lastPage)
+  } else {
+    dialogVisible.value = false
+    ElMessage.error(roleParams.id ? '更新角色失败' : '添加角色失败')
+  }
+}
+const updateRole = (row: RoleData) => {
+  dialogVisible.value = true
+  Object.assign(roleParams, row)
+  nextTick(() => {
+    form.value?.clearValidate()
+  })
+}
 const setRole = (row: any) => {}
-const updateRole = (row: any) => {}
 const deleteRole = (roleId: number) => {}
 const selectChange = () => {}
 //搜索按钮的回调
