@@ -83,7 +83,7 @@
   <!-- 抽屉 添加/更新用户 -->
   <el-drawer v-model="drawer">
     <template #header>
-      <h4>添加用户</h4>
+      <h4>{{ userParams.id ? '更新用户' : '添加用户' }}</h4>
     </template>
     <template #default>
       <el-form :model="userParams" :rules="rules" ref="formRef">
@@ -99,7 +99,7 @@
             v-model="userParams.name"
           ></el-input>
         </el-form-item>
-        <el-form-item label="用户密码" prop="password">
+        <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
           <el-input
             placeholder="请您输入用户密码"
             v-model="userParams.password"
@@ -153,6 +153,7 @@ const handler = () => {
 //添加用户
 const addUser = () => {
   Object.assign(userParams, {
+    id: '',
     username: '',
     name: '',
     password: '',
@@ -165,6 +166,10 @@ const addUser = () => {
 //更新用户
 const updateUser = (row: User) => {
   drawer.value = true
+  Object.assign(userParams, row)
+  nextTick(() => {
+    formRef.value?.clearValidate()
+  })
 }
 //保存按钮（添加、更新）
 const save = async () => {
@@ -175,6 +180,8 @@ const save = async () => {
     ElMessage.success(userParams.id ? '更新成功' : '添加成功')
     const lastPage = Math.ceil((total.value + 1) / pageSize.value)
     getHasUser(userParams.id ? pageNo.value : lastPage)
+    //浏览器自动刷新一次
+    window.location.reload()
   } else {
     drawer.value = false
     ElMessage.error(userParams.id ? '更新失败' : '添加失败')
