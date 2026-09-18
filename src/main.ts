@@ -22,12 +22,9 @@ import '@/permission'
 //获取应用实例对象
 const app = createApp(App)
 //安装element-plus插件
-// app.use(ElementPlus)
 app.use(ElementPlus, {
   locale: zhCn,
 })
-//打印环境变量
-console.log(import.meta.env)
 //安装自定义插件对象
 app.use(gloablComponent)
 //安装仓库
