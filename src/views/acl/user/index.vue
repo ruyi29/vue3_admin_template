@@ -1,5 +1,5 @@
 <template>
-  <el-card style="height: 80px">
+  <el-card>
     <el-form :inline="true" class="form">
       <el-form-item label="用户名：">
         <el-input placeholder="请输入搜索用户名" v-model="keyword"></el-input>
@@ -384,5 +384,6 @@ const reset = () => {
 .form {
   display: flex;
   justify-content: space-between;
+  height: 50px;
 }
 </style>
