@@ -12,8 +12,19 @@
   </el-card>
   <el-card style="margin: 10px 0">
     <el-button type="primary" @click="addUser">添加用户</el-button>
-    <el-button type="danger">批量删除</el-button>
-    <el-table style="margin: 10px 0" border :data="userArr">
+    <el-button
+      type="danger"
+      :disabled="selectIdArr.length == 0"
+      @click="deleteSelectUser"
+    >
+      批量删除
+    </el-button>
+    <el-table
+      style="margin: 10px 0"
+      border
+      :data="userArr"
+      @selection-change="selectChange"
+    >
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="#" type="index" align="center"></el-table-column>
       <el-table-column
@@ -70,7 +81,17 @@
           >
             编辑
           </el-button>
-          <el-button type="primary" icon="Delete" size="small">删除</el-button>
+          <el-popconfirm
+            :title="`您确定要删除“${row.username}”吗？`"
+            width="260px"
+            @confirm="deleteUser(row.id)"
+          >
+            <template #reference>
+              <el-button type="primary" icon="Delete" size="small">
+                删除
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -168,6 +189,8 @@ import {
   reqAddOrUpdateUser,
   reqAllRole,
   reqSetRole,
+  reqRemoveUser,
+  reqSelectUser,
 } from '@/api/acl/user/index'
 import type {
   UserResponseData,
@@ -195,6 +218,7 @@ let allRole = ref<AllRole>([])
 let userRole = ref<AllRole>([])
 let checkAll = ref<boolean>(false)
 const isIndeterminate = ref<boolean>(true)
+let selectIdArr = ref<User[]>([])
 
 onMounted(() => {
   getHasUser()
@@ -306,6 +330,30 @@ const confirmClick = async () => {
     getHasUser(pageNo.value)
   } else {
     ElMessage.error('分配角色失败')
+  }
+}
+//删除用户
+const deleteUser = async (userId: number) => {
+  let res = await reqRemoveUser(userId)
+  if (res.code == 200) {
+    ElMessage.success('删除用户成功')
+    getHasUser(pageNo.value)
+  } else {
+    ElMessage.error('删除用户失败')
+  }
+}
+//table复选框勾选时会触发的事件
+const selectChange = (value: any) => {
+  selectIdArr.value = value
+}
+const deleteSelectUser = async () => {
+  let idList: any = selectIdArr.value.map((item) => item.id)
+  let res = await reqSelectUser(idList)
+  if (res.code == 200) {
+    ElMessage.success('批量删除成功')
+    getHasUser(pageNo.value)
+  } else {
+    ElMessage.error('批量删除失败')
   }
 }
 </script>

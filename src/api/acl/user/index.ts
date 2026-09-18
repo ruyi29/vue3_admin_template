@@ -18,6 +18,10 @@ const API = {
   ALLROLE_URL: '/admin/acl/user/toAssign/',
   //给已有用户分配角色
   SETROLE_URL: '/admin/acl/user/doAssignRole',
+  //删除用户
+  REMOVEUSER_URL: '/admin/acl/user/remove/',
+  //批量删除用户
+  BATCHREMOVEUSER_URL: '/admin/acl/user/batchRemove',
 } as const
 
 export const reqUserInfo = (page: number, limit: number) =>
@@ -34,3 +38,7 @@ export const reqAllRole = (userId: number) =>
   request.get<any, AllRoleResponseData>(API.ALLROLE_URL + userId)
 export const reqSetRole = (data: SetRoleData) =>
   request.post<any, any>(API.SETROLE_URL, data)
+export const reqRemoveUser = (userId: number) =>
+  request.delete<any, any>(API.REMOVEUSER_URL + userId)
+export const reqSelectUser = (idList: number[]) =>
+  request.delete<any, any>(API.BATCHREMOVEUSER_URL, { data: idList })
