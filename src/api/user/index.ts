@@ -13,6 +13,4 @@ export const reqLogin = (data: loginFrom) =>
   request.post<any, loginResponseData>(API.LOGIN_URL, data)
 //获取用户信息接口方法
 export const reqUserInfo = () =>
-  request.get<any, userResponseData>(API.USERINFO_URL, {
-    headers: { token: localStorage.getItem('token') },
-  })
+  request.get<any, userResponseData>(API.USERINFO_URL)
