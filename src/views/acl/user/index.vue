@@ -2,11 +2,17 @@
   <el-card style="height: 80px">
     <el-form :inline="true" class="form">
       <el-form-item label="用户名：">
-        <el-input placeholder="请输入搜索用户名"></el-input>
+        <el-input placeholder="请输入搜索用户名" v-model="keyword"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">搜索</el-button>
-        <el-button>重置</el-button>
+        <el-button
+          type="primary"
+          :disabled="keyword ? false : true"
+          @click="search"
+        >
+          搜索
+        </el-button>
+        <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -183,6 +189,7 @@
 </template>
 
 <script setup lang="ts">
+import useLayOutSettingStore from '@/store/modules/setting'
 import { ref, onMounted, reactive, nextTick } from 'vue'
 import {
   reqUserInfo,
@@ -219,13 +226,19 @@ let userRole = ref<AllRole>([])
 let checkAll = ref<boolean>(false)
 const isIndeterminate = ref<boolean>(true)
 let selectIdArr = ref<User[]>([])
+let keyword = ref<string>('') //收集用户搜索框关键字
+let settingStore = useLayOutSettingStore() //获取模版setting仓库
 
 onMounted(() => {
   getHasUser()
 })
 const getHasUser = async (pager = 1) => {
   pageNo.value = pager
-  let res: UserResponseData = await reqUserInfo(pageNo.value, pageSize.value)
+  let res: UserResponseData = await reqUserInfo(
+    pageNo.value,
+    pageSize.value,
+    keyword.value,
+  )
   if (res.code == 200) {
     total.value = res.data.total
     userArr.value = res.data.records
@@ -355,6 +368,15 @@ const deleteSelectUser = async () => {
   } else {
     ElMessage.error('批量删除失败')
   }
+}
+//搜索按钮的回调
+const search = () => {
+  getHasUser()
+  keyword.value = ''
+}
+//重置按钮
+const reset = () => {
+  settingStore.refsh = !settingStore.refsh
 }
 </script>
 

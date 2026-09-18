@@ -24,8 +24,10 @@ const API = {
   BATCHREMOVEUSER_URL: '/admin/acl/user/batchRemove',
 } as const
 
-export const reqUserInfo = (page: number, limit: number) =>
-  request.get<any, UserResponseData>(API.ALLUSER_URL + `${page}/${limit}`)
+export const reqUserInfo = (page: number, limit: number, username: string) =>
+  request.get<any, UserResponseData>(
+    API.ALLUSER_URL + `${page}/${limit}?username=${username}`,
+  )
 //添加与编辑用户接口
 export const reqAddOrUpdateUser = (data: User) => {
   if (data.id) {
