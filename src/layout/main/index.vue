@@ -11,8 +11,10 @@
 <script setup lang="ts">
 import { watch, ref, nextTick } from 'vue'
 import useLayOutSettingStore from '@/store/modules/setting'
+
 let layoutSettingStore = useLayOutSettingStore()
 let flag = ref(true)
+
 //监听仓库数据是否发生变化
 watch(
   () => layoutSettingStore.refsh,
@@ -35,15 +37,13 @@ export default {
 <style scoped>
 .fade-enter-from {
   opacity: 0;
-  transform: scale(0);
 }
 
 .fade-enter-active {
-  transition: all 0.5s;
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-to {
   opacity: 1;
-  transform: scale(1);
 }
 </style>
