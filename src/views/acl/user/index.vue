@@ -54,7 +54,12 @@
       ></el-table-column>
       <el-table-column label="操作" align="center" width="270px">
         <template #="{ row }">
-          <el-button type="primary" icon="User" size="small">
+          <el-button
+            type="primary"
+            icon="User"
+            size="small"
+            @click="setRole(row)"
+          >
             分配角色
           </el-button>
           <el-button
@@ -114,6 +119,46 @@
       </div>
     </template>
   </el-drawer>
+  <!-- 抽屉 分配用户角色 -->
+  <el-drawer v-model="drawer1">
+    <template #header>
+      <h4>分配用户角色</h4>
+    </template>
+    <template #default>
+      <el-form :model="userParams">
+        <el-form-item label="用户姓名" prop="username">
+          <el-input v-model="userParams.username" disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="角色列表">
+          <el-checkbox
+            @change="handleCheckAllChange"
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+          >
+            全选
+          </el-checkbox>
+          <el-checkbox-group
+            v-model="userRole"
+            @change="handleCheckedCitiesChange"
+          >
+            <el-checkbox
+              v-for="(role, index) in allRole"
+              :key="index"
+              :label="role"
+            >
+              {{ role }}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button type="primary" @click="save">确定</el-button>
+        <el-button @click="cancel">取消</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -127,6 +172,7 @@ let pageSize = ref<number>(5)
 let total = ref<number>(0)
 let userArr = ref<Records>([])
 let drawer = ref<boolean>(false) //控制添加、更新用户的抽屉
+let drawer1 = ref<boolean>(false) //分配用户角色的抽屉
 let userParams = reactive<User>({
   username: '',
   name: '',
@@ -180,8 +226,8 @@ const save = async () => {
     ElMessage.success(userParams.id ? '更新成功' : '添加成功')
     const lastPage = Math.ceil((total.value + 1) / pageSize.value)
     getHasUser(userParams.id ? pageNo.value : lastPage)
-    //浏览器自动刷新一次
-    window.location.reload()
+    //浏览器自动刷新一次（后端好像没做这个token失效的功能）
+    // window.location.reload()
   } else {
     drawer.value = false
     ElMessage.error(userParams.id ? '更新失败' : '添加失败')
@@ -208,6 +254,30 @@ const rules = {
   username: [{ required: true, trigger: 'blur', validator: validatorUsername }],
   name: [{ required: true, trigger: 'blur', validator: validatorName }],
   password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
+}
+const setRole = (row: User) => {
+  drawer1.value = true
+  Object.assign(userParams, row)
+}
+//测试复选框代码
+//全选复选框收集数据：是否全选
+let checkAll = ref<boolean>(false)
+let allRole = ref(['销售', '前台', '财务', 'boss'])
+let userRole = ref(['销售', '前台'])
+//设置不确定状态，仅负责样式控制
+const isIndeterminate = ref<boolean>(true)
+//全选复选框的chang事件
+const handleCheckAllChange = (val: boolean) => {
+  userRole.value = val ? allRole.value : []
+  isIndeterminate.value = false
+}
+//底部的复选框change事件
+const handleCheckedCitiesChange = (value: string[]) => {
+  //已经勾选的这些项目的长度
+  const checkedCount = value.length
+  checkAll.value = checkedCount === allRole.value.length
+  //顶部的复选框不确定的样式
+  isIndeterminate.value = !(checkedCount === allRole.value.length)
 }
 </script>
 
