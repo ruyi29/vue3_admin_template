@@ -56,7 +56,7 @@
             type="primary"
             icon="User"
             size="small"
-            @click="setRole(row)"
+            @click="setPermission(row)"
           >
             分配权限
           </el-button>
@@ -90,7 +90,7 @@
       layout="prev, pager, next, jumper, ->, sizes, total"
       :total="total"
       @current-change="getHasRole"
-      @size-change="handler"
+      @size-change="sizeChange"
     ></el-pagination>
   </el-card>
   <!-- 对话框：添加与更新角色 -->
@@ -111,13 +111,49 @@
       <el-button @click="dialogVisible = false">取消</el-button>
     </template>
   </el-dialog>
+  <!-- 抽屉 分配权限 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4>分配菜单与按钮的权限</h4>
+    </template>
+    <template #default>
+      <!-- 树形控件 -->
+      <el-tree
+        ref="tree"
+        :data="menuArr"
+        show-checkbox
+        node-key="id"
+        :default-expanded-keys="[2, 3]"
+        :default-checked-keys="selectArr"
+        :props="defaultProps"
+        default-expand-all
+      ></el-tree>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button type="primary" @click="handler">确定</el-button>
+        <el-button @click="drawer = false">取消</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { reqRoleInfo, reqAddOrUpdateRole } from '@/api/acl/role/index'
-import type { RoleResponseData, Records, RoleData } from '@/api/acl/role/type'
+import {
+  reqRoleInfo,
+  reqAddOrUpdateRole,
+  reqAllMenuList,
+  reqSetPermission,
+} from '@/api/acl/role/index'
+import type {
+  RoleResponseData,
+  Records,
+  RoleData,
+  MenuResponseData,
+  MenuList,
+} from '@/api/acl/role/type'
 import useLayOutSettingStore from '@/store/modules/setting'
 
 let pageNo = ref<number>(1)
@@ -131,6 +167,10 @@ let roleParams = reactive<RoleData>({
   roleName: '',
 })
 let form = ref<any>()
+let drawer = ref<boolean>(false) //控制分配角色权限的抽屉
+let menuArr = ref<MenuList>([])
+let selectArr = ref<number[]>([])
+let tree = ref<any>()
 
 onMounted(() => {
   getHasRole()
@@ -150,7 +190,7 @@ const getHasRole = async (pager = 1) => {
   }
 }
 //页码变化时
-const handler = () => {
+const sizeChange = () => {
   getHasRole()
 }
 const addRole = () => {
@@ -170,6 +210,7 @@ const validatorRoleName = (rule: any, value: any, callBack: any) => {
 const rules = {
   roleName: [{ required: true, trigger: 'blur', validator: validatorRoleName }],
 }
+//添加、更新角色确定按钮
 const save = async () => {
   await form.value.validate()
   let res: any = await reqAddOrUpdateRole(roleParams)
@@ -190,7 +231,49 @@ const updateRole = (row: RoleData) => {
     form.value?.clearValidate()
   })
 }
-const setRole = (row: any) => {}
+const setPermission = async (row: RoleData) => {
+  drawer.value = true
+  Object.assign(roleParams, row)
+  let res: MenuResponseData = await reqAllMenuList(roleParams.id as number)
+  if (res.code == 200) {
+    menuArr.value = res.data
+    selectArr = filterSelectArr(menuArr.value, [])
+  }
+}
+const filterSelectArr = (allData: any, initArr: any) => {
+  allData.forEach((item: any) => {
+    if (item.select && item.level == 4) {
+      initArr.push(item.id)
+    }
+    if (item.children && item.children.length > 0) {
+      filterSelectArr(item.children, initArr)
+    }
+  })
+  return initArr
+}
+//分配权限确定按钮
+const handler = async () => {
+  const roleId = roleParams.id as number
+  //选中节点的ID
+  let arr = tree.value.getCheckedKeys()
+  //半选的ID
+  let arr1 = tree.value.getHalfCheckedKeys()
+  let permissionId = arr.concat(arr1)
+  //下发权限
+  let res = await reqSetPermission(roleId, permissionId)
+  if (res.code == 200) {
+    drawer.value = false
+    ElMessage.success('分配权限成功')
+    //刷新页面
+    window.location.reload()
+  } else {
+    ElMessage.error('分配权限失败')
+  }
+}
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+}
 const deleteRole = (roleId: number) => {}
 const selectChange = () => {}
 //搜索按钮的回调
