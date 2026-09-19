@@ -47,18 +47,51 @@
       </template>
     </el-table-column>
   </el-table>
+  <!-- 对话框：添加与更新菜单 -->
+  <el-dialog
+    v-model="dialogVisible"
+    :title="permissionParams.id ? '更新菜单' : '添加菜单'"
+    style="width: 450px"
+  >
+    <el-form
+      :model="permissionParams"
+      :rules="rules"
+      ref="form"
+      label-width="70px"
+    >
+      <el-form-item label="名称" prop="roleName">
+        <el-input
+          placeholder="请您输入菜单名称"
+          v-model="permissionParams.roleName"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="权限值" prop="roleName">
+        <el-input
+          placeholder="请您输入权限数值"
+          v-model="permissionParams.roleName"
+        ></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="save">确定</el-button>
+      <el-button @click="dialogVisible = false">取消</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { reqAllPermission } from '@/api/acl/menu/index'
 import type {
   PermisstionResponseData,
   PermisstionList,
+  Permisstion,
 } from '@/api/acl/menu/type'
 import { ElMessage } from 'element-plus'
 
 let permissionArr = ref<PermisstionList>([])
+let dialogVisible = ref<boolean>(false)
+let permissionParams = reactive<Permisstion>({})
 
 onMounted(() => {
   getHasPermission()
@@ -72,8 +105,14 @@ const getHasPermission = async () => {
     ElMessage.error('获取菜单信息失败')
   }
 }
-const addPermission = (row) => {}
-const updatePermission = (row) => {}
+const addPermission = (row: Permisstion) => {
+  dialogVisible.value = true
+}
+const updatePermission = (row: Permisstion) => {
+  dialogVisible.value = true
+}
+//添加、更新菜单确认按钮
+const save = () => {}
 const deletePermission = (row) => {}
 </script>
 
