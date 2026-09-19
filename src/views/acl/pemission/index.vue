@@ -29,7 +29,7 @@
           编辑
         </el-button>
         <el-popconfirm
-          :title="`您确定要删除“${row.roleName}”吗？`"
+          :title="`您确定要删除“${row.name}”吗？`"
           width="260px"
           @confirm="deletePermission(row.id)"
         >
@@ -50,25 +50,20 @@
   <!-- 对话框：添加与更新菜单 -->
   <el-dialog
     v-model="dialogVisible"
-    :title="permissionParams.id ? '更新菜单' : '添加菜单'"
+    :title="menuData.id ? '更新菜单' : '添加菜单'"
     style="width: 450px"
   >
-    <el-form
-      :model="permissionParams"
-      :rules="rules"
-      ref="form"
-      label-width="70px"
-    >
-      <el-form-item label="名称" prop="roleName">
+    <el-form :model="menuData" label-width="70px">
+      <el-form-item label="名称" prop="name">
         <el-input
           placeholder="请您输入菜单名称"
-          v-model="permissionParams.roleName"
+          v-model="menuData.name"
         ></el-input>
       </el-form-item>
-      <el-form-item label="权限值" prop="roleName">
+      <el-form-item label="权限值" prop="code">
         <el-input
           placeholder="请您输入权限数值"
-          v-model="permissionParams.roleName"
+          v-model="menuData.code"
         ></el-input>
       </el-form-item>
     </el-form>
@@ -81,17 +76,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import { reqAllPermission } from '@/api/acl/menu/index'
+import {
+  reqAllPermission,
+  reqAddOrUpdatePermission,
+} from '@/api/acl/menu/index'
 import type {
   PermisstionResponseData,
   PermisstionList,
   Permisstion,
+  MenuParams,
 } from '@/api/acl/menu/type'
 import { ElMessage } from 'element-plus'
 
 let permissionArr = ref<PermisstionList>([])
 let dialogVisible = ref<boolean>(false)
-let permissionParams = reactive<Permisstion>({})
+let menuData = reactive<MenuParams>({
+  code: '', //权限数值
+  level: 0, //几级菜单
+  name: '', //菜单的名字
+  pid: 0, //菜单的ID
+})
 
 onMounted(() => {
   getHasPermission()
@@ -100,19 +104,38 @@ const getHasPermission = async () => {
   let res: PermisstionResponseData = await reqAllPermission()
   if (res.code == 200) {
     permissionArr.value = res.data
-    console.log(res)
   } else {
     ElMessage.error('获取菜单信息失败')
   }
 }
 const addPermission = (row: Permisstion) => {
   dialogVisible.value = true
+  Object.assign(menuData, {
+    id: '',
+    code: '', //权限数值
+    level: 0, //几级菜单
+    name: '', //菜单的名字
+    pid: 0, //菜单的ID
+  })
+  menuData.level = row.level + 1
+  menuData.pid = row.id as number
 }
 const updatePermission = (row: Permisstion) => {
   dialogVisible.value = true
+  Object.assign(menuData, row)
 }
 //添加、更新菜单确认按钮
-const save = () => {}
+const save = async () => {
+  let res: any = await reqAddOrUpdatePermission(menuData)
+  if (res.code == 200) {
+    dialogVisible.value = false
+    ElMessage.success(menuData.id ? '更新菜单成功' : '添加菜单成功')
+    getHasPermission()
+  } else {
+    dialogVisible.value = false
+    ElMessage.error(menuData.id ? '更新菜单失败' : '添加菜单失败')
+  }
+}
 const deletePermission = (row) => {}
 </script>
 
