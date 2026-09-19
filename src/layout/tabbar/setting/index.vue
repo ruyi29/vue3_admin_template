@@ -11,7 +11,7 @@
     circle
     @click="fullScreen"
   ></el-button>
-  <el-popover placement="bottom" title="主题设置" :width="300" trigger="hover">
+  <el-popover placement="bottom" title="主题设置" :width="300" trigger="click">
     <el-form>
       <el-form-item label="主题颜色">
         <el-color-picker
@@ -19,6 +19,7 @@
           size="small"
           show-alpha
           :predefine="predefineColors"
+          @change="changeColor"
         />
       </el-form-item>
       <el-form-item label="暗黑模式">
@@ -62,6 +63,8 @@ import useUserStore from '@/store/modules/user'
 //获取骨架的小仓库
 import useLayOutSettingStore from '@/store/modules/setting'
 import { useRouter, useRoute } from 'vue-router'
+import { lighten } from 'color2k'
+
 let $router = useRouter()
 let $route = useRoute()
 let layoutSettingStore = useLayOutSettingStore()
@@ -112,7 +115,16 @@ const predefineColors = ref([
 ])
 const changeDark = () => {
   let html = document.documentElement
-  dark.value ? (html.className = 'dark') : (html.className = '')
+  if (dark.value) html.classList.add('dark')
+  else html.classList.remove('dark')
+}
+const changeColor = () => {
+  const html = document.documentElement
+  html.style.setProperty('--el-color-primary', color.value)
+  html.style.setProperty(
+    '--el-color-primary-light-5',
+    lighten(color.value, 0.2),
+  )
 }
 </script>
 

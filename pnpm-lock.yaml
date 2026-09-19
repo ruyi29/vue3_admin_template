@@ -13,6 +13,9 @@ importers:
       axios:
         specifier: ^1.19.0
         version: 1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+      color2k:
+        specifier: ^2.0.4
+        version: 2.0.4
       element-plus:
         specifier: ^2.14.5
         version: 2.14.5(vue@3.5.41(typescript@6.0.3))
@@ -2048,6 +2051,12 @@ packages:
     resolution:
       {
         integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==,
+      }
+
+  color2k@2.0.4:
+    resolution:
+      {
+        integrity: sha512-OXAPGFRNeLFnUfqDtloYdxkwsJoIdXe28+bjbpJiPqyei2HPa3VHmMCWa0Qe62+U4Ftf9Hj7hRssOkxz7WiWbg==,
       }
 
   colord@2.10.0:
@@ -7101,6 +7110,8 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
+
+  color2k@2.0.4: {}
 
   colord@2.10.0: {}
 
