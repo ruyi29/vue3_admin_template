@@ -92,7 +92,8 @@ export default {
     top: 0;
     left: $base-menu-width;
     transition: all 0.3s;
-    background: white;
+    background-color: var(--el-bg-color);
+    color: var(--el-text-color-primary);
 
     &.fold {
       width: calc(100vw - $base-menu-min-width);
@@ -104,7 +105,8 @@ export default {
     position: absolute;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    background: white;
+    background-color: var(--el-bg-color);
+    color: var(--el-text-color-primary);
     top: $base-tabbar-height;
     left: $base-menu-width;
     overflow: auto;
