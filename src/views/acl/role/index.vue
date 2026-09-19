@@ -18,12 +18,7 @@
   </el-card>
   <el-card style="margin: 10px 0">
     <el-button type="primary" @click="addRole" icon="Plus">添加角色</el-button>
-    <el-table
-      style="margin: 10px 0"
-      border
-      :data="roleArr"
-      @selection-change="selectChange"
-    >
+    <el-table style="margin: 10px 0" border :data="roleArr">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="#" type="index" align="center"></el-table-column>
       <el-table-column
@@ -146,6 +141,7 @@ import {
   reqAddOrUpdateRole,
   reqAllMenuList,
   reqSetPermission,
+  reqRemoveRole,
 } from '@/api/acl/role/index'
 import type {
   RoleResponseData,
@@ -274,8 +270,15 @@ const defaultProps = {
   children: 'children',
   label: 'name',
 }
-const deleteRole = (roleId: number) => {}
-const selectChange = () => {}
+const deleteRole = async (roleId: number) => {
+  let res = await reqRemoveRole(roleId)
+  if (res.code == 200) {
+    ElMessage.success('删除角色成功')
+    getHasRole(pageNo.value)
+  } else {
+    ElMessage.error('删除角色失败')
+  }
+}
 //搜索按钮的回调
 const search = () => {
   getHasRole()

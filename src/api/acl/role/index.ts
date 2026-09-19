@@ -13,6 +13,8 @@ const API = {
   ALLPERMISSION_URL: '/admin/acl/permission/toAssign/',
   //给角色分配权限
   SETPERMISSION_URL: '/admin/acl/permission/doAssign',
+  //删除角色
+  DELETE_URL: '/admin/acl/role/remove/',
 } as const
 
 export const reqRoleInfo = (page: number, limit: number, roleName: string) =>
@@ -29,3 +31,5 @@ export const reqSetPermission = (roleId: number, permissionId: number[]) =>
   request.post<any, any>(
     API.SETPERMISSION_URL + `?roleId=${roleId}&permissionId=${permissionId}`,
   )
+export const reqRemoveRole = (roleId: number) =>
+  request.delete<any, any>(API.DELETE_URL + roleId)
