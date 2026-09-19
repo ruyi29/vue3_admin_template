@@ -9,6 +9,8 @@ const API = {
   ADDMENU_URL: '/admin/acl/permission/save',
   //更新菜单
   UPDATEMENU_URL: '/admin/acl/permission/update',
+  //删除菜单
+  DELETEMENU_URL: '/admin/acl/permission/remove/',
 } as const
 
 export const reqAllPermission = () =>
@@ -17,3 +19,5 @@ export const reqAddOrUpdatePermission = (data: MenuParams) => {
   if (data.id) return request.put<any, any>(API.UPDATEMENU_URL, data)
   else return request.post<any, any>(API.ADDMENU_URL, data)
 }
+export const reqRemoveMenu = (menuId: number) =>
+  request.delete<any, any>(API.DELETEMENU_URL + menuId)

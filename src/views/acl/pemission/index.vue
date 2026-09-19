@@ -79,6 +79,7 @@ import { ref, onMounted, reactive } from 'vue'
 import {
   reqAllPermission,
   reqAddOrUpdatePermission,
+  reqRemoveMenu,
 } from '@/api/acl/menu/index'
 import type {
   PermisstionResponseData,
@@ -136,7 +137,15 @@ const save = async () => {
     ElMessage.error(menuData.id ? '更新菜单失败' : '添加菜单失败')
   }
 }
-const deletePermission = (row) => {}
+const deletePermission = async (menuId: number) => {
+  let res = await reqRemoveMenu(menuId)
+  if (res.code == 200) {
+    ElMessage.success('删除菜单成功')
+    getHasPermission()
+  } else {
+    ElMessage.error(res.message)
+  }
+}
 </script>
 
 <style scoped></style>
